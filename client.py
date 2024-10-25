@@ -18,54 +18,119 @@ def client_side():
 
     #Send order to do
     order = input()
-    client.send(order.encode('utf-8'))
-
-    #receive instructions
-    message = client.recv(1024).decode('utf-8')
-    print(message)
-
-    order = input()
-    client.send(order.encode('utf-8'))
-
-    #entering First name
-    message = client.recv(1024).decode('utf-8')
-    print(message)
-    Fname = input("")
-    client.send(Fname.encode('utf-8'))
     
-    #entering Last name
-    message = client.recv(1024).decode('utf-8')
-    print(message)
-    Lname = input("")
-    client.send(Lname.encode('utf-8'))
+    #AddSTD
+    if order == '1':
+        client.send(order.encode('utf-8'))
 
-    #entering Age
-    message = client.recv(1024).decode('utf-8')
-    print(message)
-    Age = input("")
-    client.send(Age.encode('utf-8'))
-
-    #entering MassarCode
-    message = client.recv(1024).decode('utf-8')
-    print(message)
-    M_code = input("")
-    client.send(M_code.encode('utf-8'))
-    message = client.recv(1024).decode('utf-8')
-    if message == "[ERROR] : This Massar code already exist !":
+        #receive instructions
+        message = client.recv(1024).decode('utf-8')
         print(message)
-        exit()
-    else:
+
+        order = input()
+        client.send(order.encode('utf-8'))
+
+        #entering First name
+        message = client.recv(1024).decode('utf-8')
         print(message)
-        degree = input("")
-        client.send(degree.encode('utf-8'))
+        Fname = input("")
+        client.send(Fname.encode('utf-8'))
+        
+        #entering Last name
+        message = client.recv(1024).decode('utf-8')
+        print(message)
+        Lname = input("")
+        client.send(Lname.encode('utf-8'))
 
-    #Inputing sector
-    message = client.recv(1024).decode('utf-8')
-    print(message)
-    sector = input("")
-    client.send(sector.encode('utf-8'))
+        #entering Age
+        message = client.recv(1024).decode('utf-8')
+        print(message)
+        Age = input("")
+        client.send(Age.encode('utf-8'))
 
-    client.close()
+        #entering MassarCode
+        message = client.recv(1024).decode('utf-8')
+        print(message)
+        M_code = input("")
+        client.send(M_code.encode('utf-8'))
+        message = client.recv(1024).decode('utf-8')
+        if message == "[ERROR] : This Massar code already exist !":
+            print(message)
+            exit()
+        else:
+            print(message)
+            degree = input("")
+            client.send(degree.encode('utf-8'))
+
+        #Inputing sector
+        message = client.recv(1024).decode('utf-8')
+        print(message)
+        sector = input("")
+        client.send(sector.encode('utf-8'))
+
+        client.close()
+
+    #DelSTD
+    elif order == '2':
+        #order for search
+        client.send(order.encode('utf-8'))
+        #receive msg to indicate level
+        msg = client.recv(1024).decode('utf-8')
+        print(msg)
+        lvl = input("")
+        client.send(lvl.encode('utf-8'))
+        #receive
+        msg = client.recv(1024).decode('utf-8')
+        print(msg)
+        M_code = input("")
+        client.send(M_code.encode('utf-8'))
+        text = client.recv(1024).decode('utf-8')
+        print(text.strip())
+
+    #ModSTD
+    elif order == '3':
+        #order for search
+        client.send(order.encode('utf-8'))
+        #receive msg to indicate level
+        msg = client.recv(1024).decode('utf-8')
+        print(msg)
+        lvl = input("")
+        client.send(lvl.encode('utf-8'))
+        #receive
+        msg = client.recv(1024).decode('utf-8')
+        print(msg)
+        M_code = input("")
+        client.send(M_code.encode('utf-8'))
+        M_code = client.recv(1024).decode('utf-8')
+        print(M_code.strip())
+
+    #ListSTD
+    elif order == '4':
+        client.send(order.encode('utf-8'))
+        message = client.recv(1024).decode()
+        print(message)
+        lvl = input("")
+        client.send(lvl.encode('utf-8'))
+        list_std = client.recv(1024).decode('utf-8')
+        print(list_std)
+
+    #SearchSTD
+    elif order == '5':
+        #order for search
+        client.send(order.encode('utf-8'))
+        #receive msg to indicate level
+        msg = client.recv(1024).decode('utf-8')
+        print(msg)
+        lvl = input("")
+        client.send(lvl.encode('utf-8'))
+        #receive
+        msg = client.recv(1024).decode('utf-8')
+        print(msg)
+        M_code = input("")
+        client.send(M_code.encode('utf-8'))
+        M_code = client.recv(1024).decode('utf-8')
+        print(M_code.strip())
+        
 
 
 if __name__ == '__main__':
