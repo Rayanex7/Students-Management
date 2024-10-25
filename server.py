@@ -67,6 +67,8 @@ def AddSTD():
             file = open(filepath, "a")
             file.write(data.format(Fname=Fname, Lname=Lname, Age=Age, M_code=M_code, Degree=float(Degree), Sec=Sec))
 
+            client.send("[Success!] Student added successfuly .".encode('utf-8'))
+
             client.close()
             server.close()
 
@@ -170,6 +172,7 @@ def ListSTD():
         client.send(lines.encode('utf-8'))
         
 def SearchSTD():
+    code = False
     level = "In which level the student is in : 1- Common Core\t2- 1st Baccalaureate\t3- 2nd Baccalaureate"
     client.send(level.encode('utf-8'))
     lvl = client.recv(1024).decode('utf-8')
@@ -182,10 +185,11 @@ def SearchSTD():
         with open (filepath, "r") as file:
             for lines in file:
                 if M_code in lines:
+                    code = True
                     client.send(lines.encode('utf-8'))
-                else:
-                    client.send("[ERROR!]: MassarCode Not Found !".encode('utf-8'))
-                    break
+            if code == False:
+                client.send("[ERROR!]: MassarCode Not Found !".encode('utf-8'))
+                return
         
     
     elif lvl == '2':
@@ -193,22 +197,23 @@ def SearchSTD():
         with open (filepath, "r") as file:
             for lines in file:
                 if M_code in lines:
+                    code = True
                     client.send(lines.encode('utf-8'))
-                else:
-                    client.send("[ERROR!]: MassarCode Not Found !".encode('utf-8'))
-                    break
+            if code == False:
+                client.send("[ERROR!]: MassarCode Not Found !".encode('utf-8'))
+                return
 
     elif lvl == '3':
         filepath = "/home/rayane/School/2nd_Bac"
         with open (filepath, "r") as file:
             for lines in file:
                 if M_code in lines:
+                    code = True
                     client.send(lines.encode('utf-8'))
-                else:
-                    client.send("[ERROR!]: MassarCode Not Found !".encode('utf-8'))
-                    break
+            if code == False:
+                client.send("[ERROR!]: MassarCode Not Found !".encode('utf-8'))
+                return
     
-
 def DelSTD():
     level = "In which level the student is in : 1- Common Core\t2- 1st Baccalaureate\t3- 2nd Baccalaureate"
     client.send(level.encode('utf-8'))
@@ -287,7 +292,8 @@ def DelSTD():
             return
         
 def ModSTD():
-    Massar = False
+    code = False
+    temp = ""
     level = "In which level the student is in : 1- Common Core\t2- 1st Baccalaureate\t3- 2nd Baccalaureate"
     client.send(level.encode('utf-8'))
     lvl = client.recv(1024).decode('utf-8')
@@ -296,41 +302,175 @@ def ModSTD():
     M_code = client.recv(1024).decode('utf-8')
 
     if lvl == '1':
-        Massar = False
         filepath = "/home/rayane/School/Common_Core"
+        
+        with open(filepath, "r") as file:
+            for lines in file:
+                if M_code not in lines:
+                    temp += lines
+
         with open (filepath, "r") as file:
             for lines in file:
                 if M_code in lines:
-                    Massar = True
-        
-        lines = ""
-        if Massar:
+                    client.send(lines.encode('utf-8'))
+                    code = True
+                    
+                
+
+        if code:            
+            client.send("First Name: ".encode('utf-8'))
+            New_Fname = client.recv(1024).decode('utf-8')
+            
+            client.send("Last Name: ".encode('utf-8'))
+            New_Lname = client.recv(1024).decode('utf-8')
+            
+            client.send("Age: ".encode('utf-8'))
+            New_Age = client.recv(1024).decode('utf-8')
+
+            client.send("MassarCode: ".encode('utf-8'))
+            New_M_code = client.recv(1024).decode('utf-8')
             with open(filepath, "r") as file:
                 for lines in file:
-                    if Mcode in lines:
-                        client.send(lines.encode('utf-8'))
+                    if New_M_code in lines:
+                        code = True
+                        client.send("[ERROR!] This MassarCode is present: ".encode('utf-8'))
+                        return
+            
+            client.send("Past year degree: ".encode('utf-8'))
+            New_Degree = client.recv(1024).decode('utf-8')
+
+            client.send("Sector: ".encode('utf-8'))
+            New_Sector = client.recv(1024).decode('utf-8')
+
+            print(f"First name: {New_Fname}\t Last name: {New_Lname}\t Age: {New_Age}\t MassarCode: {New_M_code}\t\t Past year degree: {float(New_Degree):.2f}\t Sector: {New_Sector}\n")
+
+            data = "First name: {New_Fname}\t Last name: {New_Lname}\t Age: {New_Age}\t MassarCode: {New_M_code}\t\t Past year degree: {New_Degree:.2f}\t Sector: {New_Sector}\n"
+
+            with open(filepath, "w") as file:
+                file.write(temp)
+            with open(filepath, "a") as file:
+                file.write(data.format(New_Fname=New_Fname, New_Lname=New_Lname, New_Age=New_Age, New_M_code=New_M_code, New_Degree=float(New_Degree), New_Sector=New_Sector))
+
+            client.send("Student Modified successfuly".encode('utf-8'))
+
+        else:
+            client.send("[ERROR!]: MassarCode Not Found !".encode('utf-8'))
+            return
+        
+
+
+            
     
     
     elif lvl == '2':
         filepath = "/home/rayane/School/1st_Bac"
+        with open(filepath, "r") as file:
+            for lines in file:
+                if M_code not in lines:
+                    temp += lines
+
         with open (filepath, "r") as file:
             for lines in file:
                 if M_code in lines:
                     client.send(lines.encode('utf-8'))
-                else:
-                    client.send("[ERROR!]: MassarCode Not Found !".encode('utf-8'))
-                    break
+                    code = True
+                    
+                
+
+        if code:            
+            client.send("First Name: ".encode('utf-8'))
+            New_Fname = client.recv(1024).decode('utf-8')
+            
+            client.send("Last Name: ".encode('utf-8'))
+            New_Lname = client.recv(1024).decode('utf-8')
+            
+            client.send("Age: ".encode('utf-8'))
+            New_Age = client.recv(1024).decode('utf-8')
+
+            client.send("MassarCode: ".encode('utf-8'))
+            New_M_code = client.recv(1024).decode('utf-8')
+            with open(filepath, "r") as file:
+                for lines in file:
+                    if New_M_code in lines:
+                        code = True
+                        client.send("[ERROR!] This MassarCode is present: ".encode('utf-8'))
+                        return
+            
+            client.send("Past year degree: ".encode('utf-8'))
+            New_Degree = client.recv(1024).decode('utf-8')
+
+            client.send("Sector: ".encode('utf-8'))
+            New_Sector = client.recv(1024).decode('utf-8')
+
+            print(f"First name: {New_Fname}\t Last name: {New_Lname}\t Age: {New_Age}\t MassarCode: {New_M_code}\t\t Past year degree: {float(New_Degree):.2f}\t Sector: {New_Sector}\n")
+
+            data = "First name: {New_Fname}\t Last name: {New_Lname}\t Age: {New_Age}\t MassarCode: {New_M_code}\t\t Past year degree: {New_Degree:.2f}\t Sector: {New_Sector}\n"
+
+            with open(filepath, "w") as file:
+                file.write(temp)
+            with open(filepath, "a") as file:
+                file.write(data.format(New_Fname=New_Fname, New_Lname=New_Lname, New_Age=New_Age, New_M_code=New_M_code, New_Degree=float(New_Degree), New_Sector=New_Sector))
+
+            client.send("Student Modified successfuly".encode('utf-8'))
+
+        else:
+            client.send("[ERROR!]: MassarCode Not Found !".encode('utf-8'))
+            return
 
     elif lvl == '3':
         filepath = "/home/rayane/School/2nd_Bac"
+        with open(filepath, "r") as file:
+            for lines in file:
+                if M_code not in lines:
+                    temp += lines
+
         with open (filepath, "r") as file:
             for lines in file:
                 if M_code in lines:
                     client.send(lines.encode('utf-8'))
-                else:
-                    client.send("[ERROR!]: MassarCode Not Found !".encode('utf-8'))
-                    break
+                    code = True
+                    
+                
 
+        if code:            
+            client.send("First Name: ".encode('utf-8'))
+            New_Fname = client.recv(1024).decode('utf-8')
+            
+            client.send("Last Name: ".encode('utf-8'))
+            New_Lname = client.recv(1024).decode('utf-8')
+            
+            client.send("Age: ".encode('utf-8'))
+            New_Age = client.recv(1024).decode('utf-8')
+
+            client.send("MassarCode: ".encode('utf-8'))
+            New_M_code = client.recv(1024).decode('utf-8')
+            with open(filepath, "r") as file:
+                for lines in file:
+                    if New_M_code in lines:
+                        code = True
+                        client.send("[ERROR!] This MassarCode is present: ".encode('utf-8'))
+                        return
+            
+            client.send("Past year degree: ".encode('utf-8'))
+            New_Degree = client.recv(1024).decode('utf-8')
+
+            client.send("Sector: ".encode('utf-8'))
+            New_Sector = client.recv(1024).decode('utf-8')
+
+            print(f"First name: {New_Fname}\t Last name: {New_Lname}\t Age: {New_Age}\t MassarCode: {New_M_code}\t\t Past year degree: {float(New_Degree):.2f}\t Sector: {New_Sector}\n")
+
+            data = "First name: {New_Fname}\t Last name: {New_Lname}\t Age: {New_Age}\t MassarCode: {New_M_code}\t\t Past year degree: {New_Degree:.2f}\t Sector: {New_Sector}\n"
+
+            with open(filepath, "w") as file:
+                file.write(temp)
+            with open(filepath, "a") as file:
+                file.write(data.format(New_Fname=New_Fname, New_Lname=New_Lname, New_Age=New_Age, New_M_code=New_M_code, New_Degree=float(New_Degree), New_Sector=New_Sector))
+
+            client.send("Student Modified successfuly".encode('utf-8'))
+
+        else:
+            client.send("[ERROR!]: MassarCode Not Found !".encode('utf-8'))
+            return
 
 
 
@@ -360,4 +500,3 @@ def server_side():
 
 if __name__ == '__main__':
     server_side()
-

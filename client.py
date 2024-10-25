@@ -68,6 +68,10 @@ def client_side():
         sector = input("")
         client.send(sector.encode('utf-8'))
 
+        #Succes message
+        msg = client.recv(1024).decode('utf-8')
+        print(msg)
+
         client.close()
 
     #DelSTD
@@ -100,10 +104,57 @@ def client_side():
         #receive msg to enter MassarCode
         msg = client.recv(1024).decode('utf-8')
         print(msg)
+        #enter MassarCode and send it to server
         M_code = input("")
         client.send(M_code.encode('utf-8'))
+        #receive the line with this MassarCode
         M_code = client.recv(1024).decode('utf-8')
-        print(M_code.strip())
+        if M_code == "[ERROR!]: MassarCode Not Found !":
+            print(M_code.strip())
+            return
+        
+        #Enter new infos
+        
+        #First Name
+        line = client.recv(1024).decode('utf-8')
+        print(line)
+        New_Fname = input("")
+        client.send(New_Fname.encode('utf-8'))        
+        
+        #Last Name
+        text = client.recv(1024).decode('utf-8')
+        print(text)
+        New_Lname = input("")
+        client.send(New_Lname.encode('utf-8'))
+        
+        #Age
+        text = client.recv(1024).decode('utf-8')
+        print(text)
+        New_Age = input("")
+        client.send(New_Age.encode('utf-8'))
+        
+        #MassarCode
+        text = client.recv(1024).decode('utf-8')
+        print(text)
+        New_M_code = input("")
+        client.send(New_M_code.encode('utf-8'))
+        
+        #Degree
+        text = client.recv(1024).decode('utf-8')
+        print(text)
+        New_Degree = input("")
+        client.send(New_Degree.encode('utf-8'))
+        
+        #sector
+        text = client.recv(1024).decode('utf-8')
+        print(text)
+        New_Sector = input("")
+        client.send(New_Sector.encode('utf-8'))
+
+        #Final msg
+        msg = client.recv(1024).decode('utf-8')
+        print(msg)
+
 
     #ListSTD
     elif order == '4':
@@ -130,7 +181,9 @@ def client_side():
         M_code = input("")
         client.send(M_code.encode('utf-8'))
         M_code = client.recv(1024).decode('utf-8')
+        print("************************************")
         print(M_code.strip())
+        print("************************************")
         
 
 
