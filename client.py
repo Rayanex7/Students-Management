@@ -93,10 +93,11 @@ def client_side():
         client.send(order.encode('utf-8'))
         #receive msg to indicate level
         msg = client.recv(1024).decode('utf-8')
+        #In which level the student is in
         print(msg)
         lvl = input("")
         client.send(lvl.encode('utf-8'))
-        #receive
+        #receive msg to enter MassarCode
         msg = client.recv(1024).decode('utf-8')
         print(msg)
         M_code = input("")

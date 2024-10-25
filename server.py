@@ -224,9 +224,6 @@ def DelSTD():
             for lines in file:
                 if M_code in lines:
                     Massar = True
-                else:
-                    client.send("[ERROR!]: MassarCode Not Found !".encode('utf-8'))
-                    break
         if Massar:
             temp = ""
             
@@ -239,6 +236,10 @@ def DelSTD():
                 file.write(temp)
             client.send("Student Deleted Sucessfuly !".encode('utf-8'))
     
+        else:
+            client.send("[ERROR!]: MassarCode Not Found !".encode('utf-8'))
+            return
+    
     elif lvl == '2':
         Massar = False
         filepath = "/home/rayane/School/1st_Bac"
@@ -246,9 +247,6 @@ def DelSTD():
             for lines in file:
                 if M_code in lines:
                     Massar = True
-                else:
-                    client.send("[ERROR!]: MassarCode Not Found !".encode('utf-8'))
-                    break
         if Massar:
             temp = ""
             
@@ -260,6 +258,10 @@ def DelSTD():
             with open (filepath, "w") as file:
                 file.write(temp)
             client.send("Student Deleted Sucessfuly !".encode('utf-8'))
+    
+        else:
+            client.send("[ERROR!]: MassarCode Not Found !".encode('utf-8'))
+            return
 
     elif lvl == '3':
         Massar = False
@@ -268,9 +270,6 @@ def DelSTD():
             for lines in file:
                 if M_code in lines:
                     Massar = True
-                else:
-                    client.send("[ERROR!]: MassarCode Not Found !".encode('utf-8'))
-                    break
         if Massar:
             temp = ""
             
@@ -282,8 +281,13 @@ def DelSTD():
             with open (filepath, "w") as file:
                 file.write(temp)
             client.send("Student Deleted Sucessfuly !".encode('utf-8'))
+    
+        else:
+            client.send("[ERROR!]: MassarCode Not Found !".encode('utf-8'))
+            return
         
 def ModSTD():
+    Massar = False
     level = "In which level the student is in : 1- Common Core\t2- 1st Baccalaureate\t3- 2nd Baccalaureate"
     client.send(level.encode('utf-8'))
     lvl = client.recv(1024).decode('utf-8')
@@ -292,15 +296,20 @@ def ModSTD():
     M_code = client.recv(1024).decode('utf-8')
 
     if lvl == '1':
+        Massar = False
         filepath = "/home/rayane/School/Common_Core"
         with open (filepath, "r") as file:
             for lines in file:
                 if M_code in lines:
-                    client.send(lines.encode('utf-8'))
-                else:
-                    client.send("[ERROR!]: MassarCode Not Found !".encode('utf-8'))
-                    break
+                    Massar = True
         
+        lines = ""
+        if Massar:
+            with open(filepath, "r") as file:
+                for lines in file:
+                    if Mcode in lines:
+                        client.send(lines.encode('utf-8'))
+    
     
     elif lvl == '2':
         filepath = "/home/rayane/School/1st_Bac"
