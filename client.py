@@ -16,32 +16,41 @@ print(f"Connected to server at {conn}")
 def AddSTD():
     #receive instructions
         message = client.recv(1024).decode('utf-8')
+        print("**********************************************")
         print(message)
-
+        print("**********************************************")
         order = input()
         client.send(order.encode('utf-8'))
 
         #entering First name
         message = client.recv(1024).decode('utf-8')
+        print("************************")
         print(message)
+        
         Fname = input("")
         client.send(Fname.encode('utf-8'))
         
         #entering Last name
         message = client.recv(1024).decode('utf-8')
+        print("************************")
         print(message)
+        
         Lname = input("")
         client.send(Lname.encode('utf-8'))
 
         #entering Age
         message = client.recv(1024).decode('utf-8')
+        print("************************")
         print(message)
+        
         Age = input("")
         client.send(Age.encode('utf-8'))
 
         #entering MassarCode
         message = client.recv(1024).decode('utf-8')
+        print("************************")
         print(message)
+        
         M_code = input("")
         client.send(M_code.encode('utf-8'))
         message = client.recv(1024).decode('utf-8')
@@ -49,19 +58,25 @@ def AddSTD():
             print(message)
             exit()
         else:
+            print("************************")
             print(message)
+            
             degree = input("")
             client.send(degree.encode('utf-8'))
 
         #Inputing sector
         message = client.recv(1024).decode('utf-8')
+        print("************************")
         print(message)
+        
         sector = input("")
         client.send(sector.encode('utf-8'))
 
         #Succes message
         msg = client.recv(1024).decode('utf-8')
+        print("****************************************")
         print(msg)
+        print("****************************************")
 
 def DelSTD():
     #receive msg to indicate level
@@ -205,6 +220,8 @@ def client_side():
 
         #exit
         elif order == '6':
+            client.send(order.encode('utf-8'))
+            print("Have a good time :)")
             exit()            
 
 

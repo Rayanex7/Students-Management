@@ -19,7 +19,7 @@ print(f"Got connection from : {addr}")
 
 
 def AddSTD():
-        level = "In which level the student is in : 1- Common Core\t2- 1st Baccalaureate\t3- 2nd Baccalaureate"
+        level = "In which level the student is in : \n1- Common Core\n2- 1st Baccalaureate\n3- 2nd Baccalaureate"
         client.send(level.encode('utf-8'))
 
         choice = client.recv(1024).decode('utf-8')
@@ -93,6 +93,8 @@ def AddSTD():
             file = open(filepath, "a")
             file.write(data.format(Fname=Fname, Lname=Lname, Age=Age, M_code=M_code, Degree=float(Degree), Sec=Sec))
 
+            client.send("[Success!] Student added successfuly .".encode('utf-8'))
+
             
             
 
@@ -128,6 +130,8 @@ def AddSTD():
             
             file = open(filepath, "a")
             file.write(data.format(Fname=Fname, Lname=Lname, Age=Age, M_code=M_code, Degree=float(Degree), Sec=Sec))
+
+            client.send("[Success!] Student added successfuly .".encode('utf-8'))
 
             
             
