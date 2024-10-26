@@ -15,17 +15,7 @@ print(f"SERVER LISTENING: {conn}")
 client, addr = server.accept()
 print(f"Got connection from : {addr}")
 
-#Menu
-menu = (
-    "********** Abderrahman Ibn Ghazala **********\n"
-    "1- Add Student\n"
-    "2- Delete Student\n"
-    "3- Modify Student\n"
-    "4- List Students\n"
-    "5- Search Student\n"
-    "6- Exit\n"
-    "**********************************************"
-)
+
 
 
 def AddSTD():
@@ -69,8 +59,6 @@ def AddSTD():
 
             client.send("[Success!] Student added successfuly .".encode('utf-8'))
 
-            client.close()
-            server.close()
 
         elif (choice == "2"):
             filepath = "/home/rayane/School/1st_Bac"
@@ -105,8 +93,8 @@ def AddSTD():
             file = open(filepath, "a")
             file.write(data.format(Fname=Fname, Lname=Lname, Age=Age, M_code=M_code, Degree=float(Degree), Sec=Sec))
 
-            client.close()
-            server.close()
+            
+            
 
         elif (choice == "3"):
             filepath = "/home/rayane/School/2nd_Bac"
@@ -472,31 +460,48 @@ def ModSTD():
             client.send("[ERROR!]: MassarCode Not Found !".encode('utf-8'))
             return
 
+def SendMenu():
+    menu = (
+    "********** Abderrahman Ibn Ghazala **********\n"
+    "1- Add Student\n"
+    "2- Delete Student\n"
+    "3- Modify Student\n"
+    "4- List Students\n"
+    "5- Search Student\n"
+    "6- Exit\n"
+    "**********************************************"
+    )
+    client.send(menu.encode('utf-8'))
+    
+
+
 
 
 def server_side():
-    client.send(menu.encode('utf-8'))
+    while True:
+        SendMenu()
+        order = client.recv(1024).decode('utf-8')
 
-    order = client.recv(1024).decode('utf-8')
-
-    if (order == "1"):
-        AddSTD()
-    elif (order == '2'):
-        DelSTD()
-    elif (order == '3'):
-        ModSTD()
-    elif (order == "4"):
-        ListSTD()
-    elif order == '5':
-        SearchSTD()
+        if (order == "1"):
+            AddSTD()
+        elif (order == '2'):
+            DelSTD()
+        elif (order == '3'):
+            ModSTD()
+        elif (order == "4"):
+            ListSTD()
+        elif order == '5':
+            SearchSTD()
+        elif order == '6':
+            exit()
+        
     
     
     
     
     
     
-        client.close()
-        server.close()
+    
 
 if __name__ == '__main__':
     server_side()
