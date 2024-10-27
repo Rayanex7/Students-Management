@@ -9,7 +9,7 @@ conn = (host, port)
 
 client.connect(conn)
 
-print(f"Connected to server at {conn}")
+print(f"[CONNECTED!] to server at {conn}")
 
 
 
@@ -177,10 +177,6 @@ def SearchSTD():
     print(M_code.strip())
     print("************************************")
 
-
-
-
-
 def client_side():
     while True:
         #Receive menu
@@ -222,7 +218,11 @@ def client_side():
         elif order == '6':
             client.send(order.encode('utf-8'))
             print("Have a good time :)")
-            exit()            
+            exit()
+        else:
+            client.send(order.encode('utf-8'))
+            msg = client.recv(1024).decode('utf-8')
+            print(msg) 
 
 
 if __name__ == '__main__':
