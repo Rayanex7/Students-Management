@@ -1,24 +1,16 @@
 import socket
+import threading
 
-server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 host = "192.168.1.117"
 port = 65301
 
 conn = (host, port)
 
-server.bind(conn)
 
-server.listen(1)
-
-print(f"SERVER LISTENING: {conn}")
-
-client, addr = server.accept()
-print(f"Got connection from : {addr}")
+    
 
 
-
-
-def AddSTD():
+def AddSTD(client):
         level = "In which level the student is in : \n1- Common Core\n2- 1st Baccalaureate\n3- 2nd Baccalaureate"
         client.send(level.encode('utf-8'))
 
@@ -140,7 +132,7 @@ def AddSTD():
             print("Error, enter a valid number\n")
             return
 
-def ListSTD():
+def ListSTD(client):
     level = "In which level the student is in : 1- Common Core\t2- 1st Baccalaureate\t3- 2nd Baccalaureate"
     client.send(level.encode('utf-8'))
     lvl = client.recv(1024).decode('utf-8')
@@ -163,7 +155,7 @@ def ListSTD():
             lines = file.read()
         client.send(lines.encode('utf-8'))
         
-def SearchSTD():
+def SearchSTD(client):
     code = False
     level = "In which level the student is in : 1- Common Core\t2- 1st Baccalaureate\t3- 2nd Baccalaureate"
     client.send(level.encode('utf-8'))
@@ -206,7 +198,7 @@ def SearchSTD():
                 client.send("[ERROR!]: MassarCode Not Found !".encode('utf-8'))
                 return
     
-def DelSTD():
+def DelSTD(client):
     level = "In which level the student is in : 1- Common Core\t2- 1st Baccalaureate\t3- 2nd Baccalaureate"
     client.send(level.encode('utf-8'))
     lvl = client.recv(1024).decode('utf-8')
@@ -283,7 +275,7 @@ def DelSTD():
             client.send("[ERROR!]: MassarCode Not Found !".encode('utf-8'))
             return
         
-def ModSTD():
+def ModSTD(client):
     code = False
     temp = ""
     level = "In which level the student is in : 1- Common Core\t2- 1st Baccalaureate\t3- 2nd Baccalaureate"
@@ -464,48 +456,59 @@ def ModSTD():
             client.send("[ERROR!]: MassarCode Not Found !".encode('utf-8'))
             return
 
-def SendMenu():
+def SendMenu(client):
     menu = (
-    "********** Abderrahman Ibn Ghazala **********\n"
-    "1- Add Student\n"
-    "2- Delete Student\n"
-    "3- Modify Student\n"
-    "4- List Students\n"
-    "5- Search Student\n"
-    "6- Exit\n"
-    "**********************************************"
+        "********** Abderrahman Ibn Ghazala **********\n"
+        "1- Add Student\n"
+        "2- Delete Student\n"
+        "3- Modify Student\n"
+        "4- List Students\n"
+        "5- Search Student\n"
+        "6- Exit\n"
+        "**********************************************"
     )
     client.send(menu.encode('utf-8'))
+    order = client.recv(1024).decode('utf-8')
+
+    if order == '1':
+        AddSTD(client)
+    elif order == '2':
+        DelSTD(client)
+    elif order == '3':
+        ModSTD(client)
+    elif order == '4':
+        ListSTD(client)
+    elif order == '5':
+        SearchSTD(client)
+    elif order == '6':
+        client.close()
+        return False  # Indicate to exit the loop and function
+    return True
+
+def handle_clients(client, addr):
+    print(f"[NEW CONNECTION] {addr} Connected.")
     
-
-
-
-
-def server_side():
     while True:
-        SendMenu()
-        order = client.recv(1024).decode('utf-8')
+        try:
+            if not SendMenu(client):
+                break  # Exit loop and disconnect if user chooses to exit
+        except Exception as e:
+            print(f"[ERROR] Client {addr} encountered an error: {e}")
+            break
+    print(f"[DISCONNECTED] Client {addr} Disconnected")
+    client.close()
 
-        if (order == "1"):
-            AddSTD()
-        elif (order == '2'):
-            DelSTD()
-        elif (order == '3'):
-            ModSTD()
-        elif (order == "4"):
-            ListSTD()
-        elif order == '5':
-            SearchSTD()
-        elif order == '6':
-            exit()
-        
-    
-    
-    
-    
-    
-    
-    
+def main():
+    server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    server.bind((conn))  # Replace with your IP and port
+    server.listen(5)
+    print(f"SERVER LISTENING ON PORT {port}")
+ 
+    while True:
+        client, addr = server.accept()
+        thread = threading.Thread(target=handle_clients, args=(client, addr))
+        thread.start()
+        print(f"[ACTIVE CONNECTIONS]: {threading.active_count() - 1}")
 
 if __name__ == '__main__':
-    server_side()
+    main()
