@@ -7,120 +7,57 @@ port = 65301
 conn = (host, port)
 
 def AddSTD(client):
-        level = "In which level the student is in : \n1- Common Core\n2- 1st Baccalaureate\n3- 2nd Baccalaureate"
-        client.send(level.encode('utf-8'))
+    level = "In which level the student is in : \n1- Common Core\n2- 1st Baccalaureate\n3- 2nd Baccalaureate"
+    client.send(level.encode('utf-8'))
 
-        choice = client.recv(1024).decode('utf-8')
+    choice = client.recv(1024).decode('utf-8')
 
-        if (choice == "1"):
-            filepath = "/home/rayane/School/Common_Core"
-            client.send("First Name: ".encode('utf-8'))
-            Fname = client.recv(1024).decode('utf-8')
+    if (choice == "1"):
+        filepath = "/home/rayane/School/Common_Core"
+        
+    elif (choice == "2"):
+        filepath = "/home/rayane/School/1st_Bac"
+        
+    elif (choice == "3"):
+        filepath = "/home/rayane/School/2nd_Bac"
+        
+    else:
+        print("Error, enter a valid number\n")
+        return
+    
+    client.send("First Name: ".encode('utf-8'))
+    Fname = client.recv(1024).decode('utf-8')
 
-            client.send("Last Name: ".encode('utf-8'))
-            Lname = client.recv(1024).decode('utf-8')
+    client.send("Last Name: ".encode('utf-8'))
+    Lname = client.recv(1024).decode('utf-8')
+    
+    client.send("Age: ".encode('utf-8'))
+    Age = client.recv(1024).decode('utf-8')
+
+    client.send("MassarCode: ".encode('utf-8'))
+    M_code = client.recv(1024).decode('utf-8')
+
+    with open(filepath, "r") as fl:
+        for lines in fl:
+            if M_code in lines:
+                error = "[ERROR] : This Massar code already exist !"
+                client.send(error.encode('utf-8'))
+                return
+    
             
-            client.send("Age: ".encode('utf-8'))
-            Age = client.recv(1024).decode('utf-8')
+    client.send("Past year degree: ".encode('utf-8'))
+    Degree = client.recv(1024).decode('utf-8')
 
-            client.send("MassarCode: ".encode('utf-8'))
-            M_code = client.recv(1024).decode('utf-8')
+    client.send("Sector: ".encode('utf-8'))
+    Sec = client.recv(1024).decode('utf-8')
 
-            with open(filepath, "r") as fl:
-                for lines in fl:
-                    if M_code in lines:
-                        error = "[ERROR] : This Massar code already exist !"
-                        client.send(error.encode('utf-8'))
-                        return
-            
-                    
-            client.send("Past year degree: ".encode('utf-8'))
-            Degree = client.recv(1024).decode('utf-8')
+    data = "First name: {Fname}\t Last name: {Lname}\t Age: {Age}\t MassarCode: {M_code}\t\t Past year degree: {Degree:.2f}\t Sector: {Sec}\n"
+    
+    file = open(filepath, "a")
+    file.write(data.format(Fname=Fname, Lname=Lname, Age=Age, M_code=M_code, Degree=float(Degree), Sec=Sec))
 
-            client.send("Sector: ".encode('utf-8'))
-            Sec = client.recv(1024).decode('utf-8')
-
-            data = "First name: {Fname}\t Last name: {Lname}\t Age: {Age}\t MassarCode: {M_code}\t\t Past year degree: {Degree:.2f}\t Sector: {Sec}\n"
-            
-            file = open(filepath, "a")
-            file.write(data.format(Fname=Fname, Lname=Lname, Age=Age, M_code=M_code, Degree=float(Degree), Sec=Sec))
-
-            client.send("[Success!] Student added successfuly .".encode('utf-8'))
-
-
-        elif (choice == "2"):
-            filepath = "/home/rayane/School/1st_Bac"
-            client.send("First Name: ".encode('utf-8'))
-            Fname = client.recv(1024).decode('utf-8')
-
-            client.send("Last Name: ".encode('utf-8'))
-            Lname = client.recv(1024).decode('utf-8')
-            
-            client.send("Age: ".encode('utf-8'))
-            Age = client.recv(1024).decode('utf-8')
-
-            client.send("MassarCode: ".encode('utf-8'))
-            M_code = client.recv(1024).decode('utf-8')
-
-            with open(filepath, "r") as fl:
-                for lines in fl:
-                    if M_code in lines:
-                        error = "[ERROR] : This Massar code already exist !"
-                        client.send(error.encode('utf-8'))
-                        return
-            
-                    
-            client.send("Past year degree: ".encode('utf-8'))
-            Degree = client.recv(1024).decode('utf-8')
-
-            client.send("Sector: ".encode('utf-8'))
-            Sec = client.recv(1024).decode('utf-8')
-
-            data = "First name: {Fname}\t Last name: {Lname}\t Age: {Age}\t MassarCode: {M_code}\t\t Past year degree: {Degree:.2f}\t Sector: {Sec}\n"
-            
-            file = open(filepath, "a")
-            file.write(data.format(Fname=Fname, Lname=Lname, Age=Age, M_code=M_code, Degree=float(Degree), Sec=Sec))
-
-            client.send("[Success!] Student added successfuly .".encode('utf-8'))
-
-        elif (choice == "3"):
-            filepath = "/home/rayane/School/2nd_Bac"
-            client.send("First Name: ".encode('utf-8'))
-            Fname = client.recv(1024).decode('utf-8')
-
-            client.send("Last Name: ".encode('utf-8'))
-            Lname = client.recv(1024).decode('utf-8')
-            
-            client.send("Age: ".encode('utf-8'))
-            Age = client.recv(1024).decode('utf-8')
-
-            client.send("MassarCode: ".encode('utf-8'))
-            M_code = client.recv(1024).decode('utf-8')
-
-            with open(filepath, "r") as fl:
-                for lines in fl:
-                    if M_code in lines:
-                        error = "[ERROR] : This Massar code already exist !"
-                        client.send(error.encode('utf-8'))
-                        return
-            
-                    
-            client.send("Past year degree: ".encode('utf-8'))
-            Degree = client.recv(1024).decode('utf-8')
-
-            client.send("Sector: ".encode('utf-8'))
-            Sec = client.recv(1024).decode('utf-8')
-
-            data = "First name: {Fname}\t Last name: {Lname}\t Age: {Age}\t MassarCode: {M_code}\t\t Past year degree: {Degree:.2f}\t Sector: {Sec}\n"
-            
-            file = open(filepath, "a")
-            file.write(data.format(Fname=Fname, Lname=Lname, Age=Age, M_code=M_code, Degree=float(Degree), Sec=Sec))
-
-            client.send("[Success!] Student added successfuly .".encode('utf-8'))
-
-        else:
-            print("Error, enter a valid number\n")
-            return
+    client.send("[Success!] Student added successfuly .".encode('utf-8'))
+    return
 
 def ListSTD(client):
     level = "In which level the student is in : 1- Common Core\t2- 1st Baccalaureate\t3- 2nd Baccalaureate"
@@ -270,8 +207,6 @@ def ModSTD(client):
             client.send("Sector: ".encode('utf-8'))
             New_Sector = client.recv(1024).decode('utf-8')
 
-            print(f"First name: {New_Fname}\t Last name: {New_Lname}\t Age: {New_Age}\t MassarCode: {New_M_code}\t\t Past year degree: {float(New_Degree):.2f}\t Sector: {New_Sector}\n")
-
             data = "First name: {New_Fname}\t Last name: {New_Lname}\t Age: {New_Age}\t MassarCode: {New_M_code}\t\t Past year degree: {New_Degree:.2f}\t Sector: {New_Sector}\n"
 
             with open(filepath, "w") as file:
@@ -328,6 +263,7 @@ def handle_clients(client, addr):
             print(f"[ERROR] Client {addr} encountered an error: {e}")
             break
     print(f"[DISCONNECTED] Client {addr} Disconnected")
+    print(f"[ACTIVE CONNECTIONS]: {threading.active_count() - 2}")
     client.close()
 
 def main():
