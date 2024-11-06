@@ -1,8 +1,23 @@
 import socket
 import threading
+import ssl
+import os
 
-host = "192.168.1.117"
-port = 65301
+
+def assign_ip():
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    
+    try:
+        s.connect(("8.8.8.8", 80))
+        ip = s.getsockname()[0]
+    except Exception as e:
+        print(f"Cannot assign an IPv4 Address: {[e]}")
+    finally:
+        return ip
+    
+IP = assign_ip()
+host = IP
+port = 65300
 
 conn = (host, port)
 
@@ -196,7 +211,9 @@ def ModSTD(client):
             New_M_code = client.recv(1024).decode('utf-8')
             with open(filepath, "r") as file:
                 for lines in file:
-                    if New_M_code in lines:
+                    if New_M_code == M_code:
+                        continue
+                    elif New_M_code in lines:
                         code = True
                         client.send("[ERROR!] This MassarCode is present: ".encode('utf-8'))
                         return
@@ -266,17 +283,43 @@ def handle_clients(client, addr):
     print(f"[ACTIVE CONNECTIONS]: {threading.active_count() - 2}")
     client.close()
 
-def main():
-    server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server.bind((conn))
-    server.listen(5)
-    print(f"SERVER LISTENING ON PORT {port}")
- 
+def END_SERVER():
     while True:
-        client, addr = server.accept()
+        end = input()
+        if end.lower() == 'exit':
+            print("Server is shutting down !")
+            os._exit(0)
+
+def main():
+    # Standard TCP server setup
+    sserver = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sserver.bind(conn)
+    sserver.listen(5)
+    
+    # SSL context setup
+    context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
+    context.load_cert_chain(certfile="/home/rayane/School/Students-Management/SSL/cert.pem", keyfile="/home/rayane/School/Students-Management/SSL/key.pem")
+
+    print(f"SERVER LISTENING ON PORT {port}")
+
+    input_threads = threading.Thread(target=END_SERVER)
+    input_threads.start()
+
+    while True:
+
+        
+        
+        # Accept a new client connection
+        client, addr = sserver.accept()
+        
+        # Wrap the client socket with SSL
+        client = context.wrap_socket(client, server_side=True)
+        
+        # Start a new thread for each client
         thread = threading.Thread(target=handle_clients, args=(client, addr))
         thread.start()
-        print(f"[ACTIVE CONNECTIONS]: {threading.active_count() - 1}")
+        print(f"[ACTIVE CONNECTIONS]: {threading.active_count() - 2}")
+
 
 if __name__ == '__main__':
     main()
