@@ -3,6 +3,8 @@ import threading
 import ssl
 import os
 import json
+import uuid
+
 
 class protocole:
     def __init__(self, client):
@@ -458,10 +460,6 @@ def get_client_IP():
     CLIENT_IP = addr[0]
     return CLIENT_IP
 
-
-        
-
-
-
 if __name__ == '__main__':
     main()
+    

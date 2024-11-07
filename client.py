@@ -35,7 +35,7 @@ context = ssl.create_default_context()
 context.check_hostname = False  # Disable hostname checking
 context.verify_mode = ssl.CERT_NONE  # Disable certificate verification
 
-host = "192.168.1.117"
+host = "192.168.1.114"
 port = 65300
 
 client = context.wrap_socket(sclient, server_hostname=host)
