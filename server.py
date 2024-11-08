@@ -10,7 +10,6 @@ class protocole:
     def __init__(self, client):
         self.client = client
         
-
     def Protocole(self, HOST, CLIENT, TYPE, DATA):
         protocole = {  "FROM" : f"{HOST}",
                         "TO"   : f"{CLIENT}",
@@ -18,6 +17,40 @@ class protocole:
                         "WHAT" : f"{DATA}",
                         }
         return protocole
+    
+    def authentication(self, client):
+        for i in range(2):
+            usr_requ = protocole.Protocole(self, IP, get_client_IP(), type("Username: "), "Username: ")
+            json_usr_requ = dic_to_json(usr_requ)
+            client.send(json_usr_requ.encode('utf-8'))
+
+            json_user = client.recv(1024).decode('utf-8')
+            user = json_to_dic(json_user)
+
+            passwd_requ = protocole.Protocole(self, IP, get_client_IP(), type("Password: "), "Password: ")
+            json_passwd_requ = dic_to_json(passwd_requ)
+            client.send(json_passwd_requ.encode('utf-8'))
+
+            json_passwd = client.recv(1024).decode('utf-8')
+            passwd = json_to_dic(json_passwd)
+
+            with open("authors.json", "r") as file:
+                authors = json.load(file)
+
+                
+                if authors["Username"] == user["WHAT"] and authors["Password"] == passwd["WHAT"]:
+                    dic_msg = protocole.Protocole(self, IP, get_client_IP(), type("[WELCOME!]"), "[WELCOME!]")
+                    msg = dic_to_json(dic_msg)
+                    client.send(msg.encode('utf-8'))
+                    return True
+
+                else:
+                    dic_msg = protocole.Protocole(self, IP, get_client_IP(), type("[Authentication Failed]"), "[Authentication Failed]")
+                    msg = dic_to_json(dic_msg)
+                    client.send(msg.encode('utf-8'))
+        return False
+            
+
       
 def assign_ip():
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -379,7 +412,7 @@ def SendMenu(client, addr):
         "6- Exit\n"
         "**********************************************"
     )
-
+    
     dic_msg = new_client.Protocole(IP, addr[0], type(menu), menu)
     json_msg = dic_to_json(dic_msg)
     client.send(json_msg.encode('utf-8'))
@@ -405,20 +438,39 @@ def SendMenu(client, addr):
         error = dic_to_json(dic_error)
         client.send(error.encode('utf-8'))
     return True
+    
+def is_auth(client):
+    auth = protocole(addr)
+    try:
+
+        if auth.authentication(client):
+            return True
+        else:
+            print("Too many attempts !")
+            client.close()
+            return False
+
+    except Exception as e:
+        print(f"[ERROR]: {e}")
+        return False
 
 def handle_clients(client, addr):
     print(f"[NEW CONNECTION] {addr} Connected.")
-    
-    while True:
-        try:
-            if not SendMenu(client, addr):
-                break  # Exit loop and disconnect if user chooses to exit
-        except Exception as e:
-            print(f"[ERROR] Client {addr} encountered an error: {e}")
-            break
-    print(f"[DISCONNECTED] Client {addr} Disconnected")
-    print(f"[ACTIVE CONNECTIONS]: {threading.active_count() - 2}")
-    client.close()
+    if is_auth(client):
+        while True:
+            try:
+                if not SendMenu(client, addr):
+                    break  # Exit loop and disconnect if user chooses to exit
+            except Exception as e:
+                print(f"[ERROR] Client {addr} encountered an error: {e}")
+                break
+        print(f"[DISCONNECTED] Client {addr} Disconnected")
+        print(f"[ACTIVE CONNECTIONS]: {threading.active_count() - 2}")
+        client.close()
+    else:
+        print(f"[DISCONNECTED] Client {addr} Disconnected")
+        print(f"[ACTIVE CONNECTIONS]: {threading.active_count() - 2}")
+        client.close()
 
 def END_SERVER():
     while True:

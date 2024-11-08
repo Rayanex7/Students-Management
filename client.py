@@ -14,6 +14,39 @@ class protocole:
                         "WHAT" : f"{DATA}",
                         }
         return protocole
+    
+    def authentication(self, client):
+        for i in range(2):
+            json_user_requ = client.recv(1024).decode('utf-8')
+            user_requ = json_to_dic(json_user_requ)
+            print(user_requ["WHAT"])
+
+            user = input()
+            user_dic_msg = new_client.Protocole(assign_ip(), host, type(user), user)
+            user_msg = dic_to_json(user_dic_msg)
+            client.send(user_msg.encode("utf-8"))
+            
+
+            json_pass_requ = client.recv(1024).decode('utf-8')
+            pass_requ = json_to_dic(json_pass_requ)
+            print(pass_requ["WHAT"])
+            
+            passwd = input()
+            passwd_dic_msg = new_client.Protocole(assign_ip(), host, type(passwd), passwd)
+            passwd_msg = dic_to_json(passwd_dic_msg)
+            client.send(passwd_msg.encode("utf-8"))
+
+            msg = client.recv(1024).decode('utf-8')
+            d_msg = json_to_dic(msg)
+            if d_msg["WHAT"] == "[Authentication Failed]":
+                print(d_msg["WHAT"]) 
+            else:
+                print(d_msg["WHAT"])
+                i = 30
+                return i
+        if i == 1:
+            print("To many attempts")
+            exit() 
 
 def assign_ip():
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -35,7 +68,7 @@ context = ssl.create_default_context()
 context.check_hostname = False  # Disable hostname checking
 context.verify_mode = ssl.CERT_NONE  # Disable certificate verification
 
-host = "192.168.1.114"
+host = "192.168.1.117"
 port = 65300
 
 client = context.wrap_socket(sclient, server_hostname=host)
@@ -149,7 +182,9 @@ def DelSTD():
     json_msg = client.recv(1024).decode('utf-8')
     msg = json_to_dic(json_msg)
     print(msg["WHAT"])
+    
     while True:
+        
         lvl = input("")
         if lvl in ['1','2','3']:
             dic_lvl = new_client.Protocole(host, assign_ip(), type(lvl), lvl)
@@ -333,10 +368,12 @@ def recv_menu():
     #Receive menu
     err_msg = client.recv(1024).decode('utf-8')
     msg = json_to_dic(err_msg)
-    print(f"{msg["WHAT"]}")
+    print(f'{msg["WHAT"]}')
 
 def client_side():
-    
+    auth = protocole(assign_ip())
+    auth.authentication(client)
+
     while True:
 
         recv_menu()
@@ -387,7 +424,6 @@ def client_side():
             client.send(order.encode('utf-8'))
             msg = client.recv(1024).decode('utf-8')
             print(msg) 
-
 
 if __name__ == '__main__':
     client_side()
