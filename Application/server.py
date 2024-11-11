@@ -4,7 +4,6 @@ import ssl
 import os
 import json
 import random
-import string
 
 
 class protocole:
@@ -21,6 +20,8 @@ class protocole:
         return protocole
     
     def authentication(self, client):
+            status = False
+
             usr_requ = protocole.Protocole(self, IP, get_client_IP(), type("Username: "), str("Username: "))
             json_usr_requ = dic_to_json(usr_requ)
             client.send(json_usr_requ.encode('utf-8'))
@@ -61,25 +62,27 @@ class protocole:
                     with open("Users_ID.json", "r") as file:
                         data = {"Username":user["WHAT"],"Password":passwd["WHAT"],"ID":user_ID}
                         users = json.load(file)
+                    status = True
 
-            for a in users:
-                if data["Username"] and data["Password"] and data["ID"] in a:
-                    continue
-                else:
-                    users = [users]
-                    users.append(data)
-                    with open("Users_ID.json", "w") as file:        
-                        json.dump(users, file, indent=4)
+            if status == True:
+                for a in users:
+                    if data["Username"] and data["Password"] and data["ID"] in a:
+                        continue
+                    else:
+                        users = [users]
+                        users.append(data)
+                        with open("Users_ID.json", "w") as file:        
+                            json.dump(users, file, indent=4)
 
-                    dic_msg = protocole.Protocole(self, IP, get_client_IP(), type("[WELCOME!]"), "[WELCOME!]", str(user_ID))
-                    msg = dic_to_json(dic_msg)
-                    client.send(msg.encode('utf-8'))
-                    return True
+                        dic_msg = protocole.Protocole(self, IP, get_client_IP(), type("[WELCOME!]"), "[WELCOME!]", str(user_ID))
+                        msg = dic_to_json(dic_msg)
+                        client.send(msg.encode('utf-8'))
+                        return True
             else:
-                data = protocole.Protocole(self, IP, get_client_IP(), type("[Authentication Failed]"), "[Authentication Failed]")
+                data = protocole.Protocole(self, IP, get_client_IP(), type("[AUTHENTICATION FAILED]"), "[AUTHENTICATION FAILED]")
                 msg = dic_to_json(data)
                 client.send(msg.encode('utf-8'))
-                return False
+                return False                
                
        
 def assign_ip():
@@ -449,6 +452,8 @@ def SendMenu(client, addr):
 
     json_order = client.recv(1024).decode('utf-8')
     order = json_to_dic(json_order)
+
+    
 
     if order["WHAT"] == '1':
         AddSTD(client)

@@ -40,9 +40,9 @@ class protocole:
         d_msg = json_to_dic(msg)  
 
         
-        if d_msg["WHAT"] == "[Authentication Failed]":
+        if d_msg["WHAT"] == "[AUTHENTICATION FAILED]":
             print(d_msg["WHAT"])
-            return False
+            exit()
 
         else:
             with open("user.json", "w") as file:
@@ -431,8 +431,8 @@ def client_side():
 
             recv_menu()
 
-            #Send order to do
             order = input()
+
             #AddSTD
             if order == '1':
                 dic_msg = new_client.Protocole(host, assign_ip(), type(order), order)
@@ -470,7 +470,9 @@ def client_side():
 
             #exit
             elif order == '6':
-                client.send(order.encode('utf-8'))
+                dic_msg = new_client.Protocole(host, assign_ip(), type(order), order)
+                msg = dic_to_json(dic_msg)
+                client.send(msg.encode('utf-8'))
                 print("Have a good time :)")
                 exit()
             else:
@@ -521,7 +523,9 @@ def client_side():
 
             #exit
             elif order == '6':
-                client.send(order.encode('utf-8'))
+                dic_msg = new_client.Protocole(host, assign_ip(), type(order), order)
+                msg = dic_to_json(dic_msg)
+                client.send(msg.encode('utf-8'))
                 print("Have a good time :)")
                 exit()
             else:
