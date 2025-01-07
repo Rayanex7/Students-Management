@@ -1,6 +1,9 @@
 import socket
 import ssl
 import json
+from tabulate import tabulate
+import ast
+from datetime import datetime 
 
 class protocole:
     def __init__(self, client):
@@ -52,7 +55,9 @@ class protocole:
             print(d_msg["WHAT"])
             return  
 
-    
+unix_to_formatted = lambda x: datetime.fromtimestamp(x).strftime('%Y/%m/%d')
+formatted_to_unix = lambda x: int(datetime.strptime(x, '%Y/%m/%d').timestamp())
+
 global new_client
 
 def assign_ip():
@@ -95,17 +100,6 @@ def json_to_dic(msg):
     return new_msg
 
 def AddSTD():
-    #receive instructions
-        dic_message = client.recv(1024).decode('utf-8')
-        message = json_to_dic(dic_message)
-        print("**********************************************")
-        print(message["WHAT"])
-        print("**********************************************")
-
-        order = input()
-        dic_msg = new_client.Protocole(assign_ip(), host, type(order), order)
-        msg = dic_to_json(dic_msg)
-        client.send(msg.encode('utf-8'))
 
         #entering First name
         dic_message = client.recv(1024).decode('utf-8')
@@ -152,28 +146,80 @@ def AddSTD():
         client.send(msg.encode('utf-8'))
         
         dic_message = client.recv(1024).decode('utf-8')
-        if message == "[ERROR] : This Massar code already exist !":
-            print(message)
-            exit()
-        
-        #degree
+
+        #Gender
         message = json_to_dic(dic_message)
         print("************************")
         print(message["WHAT"])
         
-        degree = input("")
-        dic_msg = new_client.Protocole(assign_ip(), host, type(degree), degree)
+        Gender = input("")
+        dic_msg = new_client.Protocole(assign_ip(), host, type(Gender), Gender)
         msg = dic_to_json(dic_msg)
         client.send(msg.encode('utf-8'))
 
-        #Inputing sector
+        #Inputing Email
         dic_message = client.recv(1024).decode('utf-8')
         message = json_to_dic(dic_message)
         print("************************")
         print(message["WHAT"])
         
-        sector = input("")
-        dic_msg = new_client.Protocole(assign_ip(), host, type(sector), sector)
+        Email = input("")
+        dic_msg = new_client.Protocole(assign_ip(), host, type(Email), Email)
+        msg = dic_to_json(dic_msg)
+        client.send(msg.encode('utf-8'))
+
+        #Inputing Country
+        dic_message = client.recv(1024).decode('utf-8')
+        message = json_to_dic(dic_message)
+        print("************************")
+        print(message["WHAT"])
+        
+        Country = input("")
+        dic_msg = new_client.Protocole(assign_ip(), host, type(Country), Country)
+        msg = dic_to_json(dic_msg)
+        client.send(msg.encode('utf-8'))
+
+        #Inputing City
+        dic_message = client.recv(1024).decode('utf-8')
+        message = json_to_dic(dic_message)
+        print("************************")
+        print(message["WHAT"])
+        
+        City = input("")
+        dic_msg = new_client.Protocole(assign_ip(), host, type(City), City)
+        msg = dic_to_json(dic_msg)
+        client.send(msg.encode('utf-8'))
+
+        #Inputing Address
+        dic_message = client.recv(1024).decode('utf-8')
+        message = json_to_dic(dic_message)
+        print("************************")
+        print(message["WHAT"])
+        
+        Address = input("")
+        dic_msg = new_client.Protocole(assign_ip(), host, type(Address), Address)
+        msg = dic_to_json(dic_msg)
+        client.send(msg.encode('utf-8'))
+
+        #Inputing Phone
+        dic_message = client.recv(1024).decode('utf-8')
+        message = json_to_dic(dic_message)
+        print("************************")
+        print(message["WHAT"])
+        
+        Phone = input("")
+        dic_msg = new_client.Protocole(assign_ip(), host, type(Phone), Phone)
+        msg = dic_to_json(dic_msg)
+        client.send(msg.encode('utf-8'))
+
+        #Inputing ClassID
+        dic_message = client.recv(1024).decode('utf-8')
+        message = json_to_dic(dic_message)
+        print("************************")
+        print(message["WHAT"])
+        
+        ClassID = input("")
+        dic_msg = new_client.Protocole(assign_ip(), host, type(ClassID), ClassID)
         msg = dic_to_json(dic_msg)
         client.send(msg.encode('utf-8'))
 
@@ -185,190 +231,459 @@ def AddSTD():
         print("****************************************")
 
 def DelSTD():
-    #receive msg to indicate level
+
+    while True:
+
+        #receive
+        json_msg = client.recv(1024).decode('utf-8')
+        msg = json_to_dic(json_msg)
+        print(msg["WHAT"])
+
+        M_code = input("")
+        dic_msg = new_client.Protocole(host, assign_ip(), type(M_code), M_code)
+        msg = dic_to_json(dic_msg)
+        client.send(msg.encode('utf-8'))
+
+        s_text = client.recv(1024).decode('utf-8')
+        text = json_to_dic(s_text)
+        print(text["WHAT"].strip())
+        return
+
+def ModSTD():
+
+    #receive msg to enter MassarCode
     json_msg = client.recv(1024).decode('utf-8')
     msg = json_to_dic(json_msg)
     print(msg["WHAT"])
+
+    #enter MassarCode and send it to server
+    M_code = input("")
+    dic_msg = new_client.Protocole(host, assign_ip(), type(M_code), M_code)
+    msg = dic_to_json(dic_msg)
+    client.send(msg.encode('utf-8'))
+
+    Nmsg = client.recv(1024).decode('utf-8')
+    msg = json_to_dic(Nmsg)
     
-    while True:
-        
-        lvl = input("")
-        if lvl in ['1','2','3']:
-            dic_lvl = new_client.Protocole(host, assign_ip(), type(lvl), lvl)
-            lvl = dic_to_json(dic_lvl)
-            client.send(lvl.encode('utf-8'))
-            
-            #receive
-            json_msg = client.recv(1024).decode('utf-8')
-            msg = json_to_dic(json_msg)
-            print(msg["WHAT"])
+    if msg["WHAT"] == "[ERROR] No Massar Code Found !":
+        print(msg["WHAT"])
+        return
 
-            M_code = input("")
-            dic_msg = new_client.Protocole(host, assign_ip(), type(M_code), M_code)
-            msg = dic_to_json(dic_msg)
-            client.send(msg.encode('utf-8'))
-
-            s_text = client.recv(1024).decode('utf-8')
-            text = json_to_dic(s_text)
-            print(text["WHAT"].strip())
-            return
-        else:
-            print("[ERROR!] Enter A Valid Number !")
-
-def ModSTD():
-    #receive msg to indicate level
-    lvl_msg = client.recv(1024).decode('utf-8')
-    msg = json_to_dic(lvl_msg)
+    #receive msg to choose what to change
+    
     print(msg["WHAT"])
 
-    while True:
-        lvl = input("")
-        if lvl in ['1','2','3']:
-            dic_lvl = new_client.Protocole(host, assign_ip(), type(lvl), lvl)
-            lvl = dic_to_json(dic_lvl)
-            client.send(lvl.encode('utf-8'))
-            #receive msg to enter MassarCode
-            json_msg = client.recv(1024).decode('utf-8')
-            msg = json_to_dic(json_msg)
+    resp = input()
+    dic_msg = new_client.Protocole(host, assign_ip(), type(resp), resp)
+    msg = dic_to_json(dic_msg)
+    client.send(msg.encode('utf-8'))
+
+    if resp == "1":
+        #entering First name
+        dic_message = client.recv(1024).decode('utf-8')
+        message = json_to_dic(dic_message)
+        print("************************")
+        print(message["WHAT"])
+        
+        Fname = input("")
+        dic_msg = new_client.Protocole(assign_ip(), host, type(Fname), Fname)
+        msg = dic_to_json(dic_msg)
+        client.send(msg.encode('utf-8'))
+        
+        #entering Last name
+        dic_message = client.recv(1024).decode('utf-8')
+        message = json_to_dic(dic_message)
+        print("************************")
+        print(message["WHAT"])
+        
+        Lname = input("")
+        dic_msg = new_client.Protocole(assign_ip(), host, type(Lname), Lname)
+        msg = dic_to_json(dic_msg)
+        client.send(msg.encode('utf-8'))
+
+        #entering Age
+        dic_message = client.recv(1024).decode('utf-8')
+        message = json_to_dic(dic_message)
+        print("************************")
+        print(message["WHAT"])
+        
+        Age = input("")
+        dic_msg = new_client.Protocole(assign_ip(), host, type(Age), Age)
+        msg = dic_to_json(dic_msg)
+        client.send(msg.encode('utf-8'))
+
+        #entering MassarCode
+        dic_message = client.recv(1024).decode('utf-8')
+        message = json_to_dic(dic_message)
+        print("************************")
+        print(message["WHAT"])
+        
+        M_code = input("")
+        dic_msg = new_client.Protocole(assign_ip(), host, type(M_code), M_code)
+        msg = dic_to_json(dic_msg)
+        client.send(msg.encode('utf-8'))
+        
+        dic_message = client.recv(1024).decode('utf-8')
+
+        #Gender
+        message = json_to_dic(dic_message)
+        print("************************")
+        print(message["WHAT"])
+        
+        Gender = input("")
+        dic_msg = new_client.Protocole(assign_ip(), host, type(Gender), Gender)
+        msg = dic_to_json(dic_msg)
+        client.send(msg.encode('utf-8'))
+
+        #Inputing Email
+        dic_message = client.recv(1024).decode('utf-8')
+        message = json_to_dic(dic_message)
+        print("************************")
+        print(message["WHAT"])
+        
+        Email = input("")
+        dic_msg = new_client.Protocole(assign_ip(), host, type(Email), Email)
+        msg = dic_to_json(dic_msg)
+        client.send(msg.encode('utf-8'))
+
+        #Inputing Country
+        dic_message = client.recv(1024).decode('utf-8')
+        message = json_to_dic(dic_message)
+        print("************************")
+        print(message["WHAT"])
+        
+        Country = input("")
+        dic_msg = new_client.Protocole(assign_ip(), host, type(Country), Country)
+        msg = dic_to_json(dic_msg)
+        client.send(msg.encode('utf-8'))
+
+        #Inputing City
+        dic_message = client.recv(1024).decode('utf-8')
+        message = json_to_dic(dic_message)
+        print("************************")
+        print(message["WHAT"])
+        
+        City = input("")
+        dic_msg = new_client.Protocole(assign_ip(), host, type(City), City)
+        msg = dic_to_json(dic_msg)
+        client.send(msg.encode('utf-8'))
+
+        #Inputing Address
+        dic_message = client.recv(1024).decode('utf-8')
+        message = json_to_dic(dic_message)
+        print("************************")
+        print(message["WHAT"])
+        
+        Address = input("")
+        dic_msg = new_client.Protocole(assign_ip(), host, type(Address), Address)
+        msg = dic_to_json(dic_msg)
+        client.send(msg.encode('utf-8'))
+
+        #Inputing Phone
+        dic_message = client.recv(1024).decode('utf-8')
+        message = json_to_dic(dic_message)
+        print("************************")
+        print(message["WHAT"])
+        
+        Phone = input("")
+        dic_msg = new_client.Protocole(assign_ip(), host, type(Phone), Phone)
+        msg = dic_to_json(dic_msg)
+        client.send(msg.encode('utf-8'))
+
+        #Inputing ClassID
+        dic_message = client.recv(1024).decode('utf-8')
+        message = json_to_dic(dic_message)
+        print("************************")
+        print(message["WHAT"])
+        
+        ClassID = input("")
+        dic_msg = new_client.Protocole(assign_ip(), host, type(ClassID), ClassID)
+        msg = dic_to_json(dic_msg)
+        client.send(msg.encode('utf-8'))
+
+        #Succes message
+        dic_message = client.recv(1024).decode('utf-8')
+        msg = json_to_dic(dic_message)
+        print("****************************************")
+        print(msg["WHAT"])
+        print("****************************************")
+
+    elif resp == "2":
+        while True:
+            Nmsg = client.recv(1024).decode('utf-8')
+            msg = json_to_dic(Nmsg)
             print(msg["WHAT"])
 
-            #enter MassarCode and send it to server
-            M_code = input("")
-            dic_msg = new_client.Protocole(host, assign_ip(), type(M_code), M_code)
-            msg = dic_to_json(dic_msg)
-            client.send(msg.encode('utf-8'))
+            #Choose Operation
+            op = input()
 
-            #receive the line with this MassarCodelines
-            json_M_code = client.recv(1024).decode('utf-8')
-            M_code = json_to_dic(json_M_code)
-            if M_code["WHAT"] == "[ERROR!]: MassarCode Not Found !":
-                print(M_code["WHAT"].strip())
-                return
-            
-            #Enter new infos
-            
-            print(M_code["WHAT"])
+            if op == "1": #change Massar
+                Ndata = new_client.Protocole(host, assign_ip(), type(op), op)
+                data = dic_to_json(Ndata)
+                client.send(data.encode('utf-8'))
 
-            #First Name
-            json_line = client.recv(1024).decode('utf-8')
-            line = json_to_dic(json_line)
-            print(line["WHAT"])
-            New_Fname = input("")
-            dic_msg = new_client.Protocole(host, assign_ip(), type(New_Fname), New_Fname)
-            msg = dic_to_json(dic_msg)
-            client.send(msg.encode('utf-8'))
-            
-            #Last Name
-            json_line = client.recv(1024).decode('utf-8')
-            line = json_to_dic(json_line)
-            print(line["WHAT"])
-            New_Lname = input("")
-            dic_msg = new_client.Protocole(host, assign_ip(), type(New_Lname), New_Lname)
-            msg = dic_to_json(dic_msg)
-            client.send(msg.encode('utf-8'))
-            
-            #Age
-            json_line = client.recv(1024).decode('utf-8')
-            line = json_to_dic(json_line)
-            print(line["WHAT"])
-            New_Age = input("")
-            dic_msg = new_client.Protocole(host, assign_ip(), type(New_Age), New_Age)
-            msg = dic_to_json(dic_msg)
-            client.send(msg.encode('utf-8'))
-            
-            #MassarCode
-            json_line = client.recv(1024).decode('utf-8')
-            line = json_to_dic(json_line)
-            print(line["WHAT"])
-            New_M_code = input("")
-            dic_msg = new_client.Protocole(host, assign_ip(), type(New_M_code), New_M_code)
-            msg = dic_to_json(dic_msg)
-            client.send(msg.encode('utf-8'))
+                Nmsg = client.recv(1024).decode('utf-8')
+                msg = json_to_dic(Nmsg)
+                print(msg["WHAT"])
+                
+                new = input()
+                Odata = new_client.Protocole(host, assign_ip(), type(new), new)
+                data = dic_to_json(Odata)
+                client.send(data.encode('utf-8'))
 
-            
-            #Degree
-            json_line = client.recv(1024).decode('utf-8')
-            line = json_to_dic(json_line)
-            if line["WHAT"] == "[ERROR!] This MassarCode is present: ":
-                print("[ERROR!] This MassarCode is present: ")
-                return
-            
-            print(line["WHAT"])
-            New_Degree = input("")
-            dic_msg = new_client.Protocole(host, assign_ip(), type(New_Degree), New_Degree)
-            msg = dic_to_json(dic_msg)
-            client.send(msg.encode('utf-8'))
-            
-            #sector
-            json_line = client.recv(1024).decode('utf-8')
-            line = json_to_dic(json_line)
-            print(line["WHAT"])
-            New_Sector = input("")
-            dic_msg = new_client.Protocole(host, assign_ip(), type(New_Sector), New_Sector)
-            msg = dic_to_json(dic_msg)
-            client.send(msg.encode('utf-8'))
+                msg = client.recv(1024).decode('utf-8')
+                Nmsg = json_to_dic(msg)
+                print(Nmsg["WHAT"])
+                
 
-            #Final msg
-            json_msg = client.recv(1024).decode('utf-8')
-            msg = json_to_dic(json_msg)
-            print(msg["WHAT"])
-            return
-        else:
-            print("[ERROR!] Enter A Valid Number !")
+            elif op == "2": #change first name
+                Ndata = new_client.Protocole(host, assign_ip(), type(op), op)
+                data = dic_to_json(Ndata)
+                client.send(data.encode('utf-8'))
+
+                Nmsg = client.recv(1024).decode('utf-8')
+                msg = json_to_dic(Nmsg)
+                print(msg["WHAT"])
+                
+                new = input()
+                Odata = new_client.Protocole(host, assign_ip(), type(new), new)
+                data = dic_to_json(Odata)
+                client.send(data.encode('utf-8'))
+
+                msg = client.recv(1024).decode('utf-8')
+                Nmsg = json_to_dic(msg)
+                print(Nmsg["WHAT"])
+                
+            
+            elif op == "3": #change last name
+                Ndata = new_client.Protocole(host, assign_ip(), type(op), op)
+                data = dic_to_json(Ndata)
+                client.send(data.encode('utf-8'))
+
+                Nmsg = client.recv(1024).decode('utf-8')
+                msg = json_to_dic(Nmsg)
+                print(msg["WHAT"])
+                
+                new = input()
+                Odata = new_client.Protocole(host, assign_ip(), type(new), new)
+                data = dic_to_json(Odata)
+                client.send(data.encode('utf-8'))
+
+                msg = client.recv(1024).decode('utf-8')
+                Nmsg = json_to_dic(msg)
+                print(Nmsg["WHAT"])
+                
+            
+            elif op == "4": #change birthdate
+                Ndata = new_client.Protocole(host, assign_ip(), type(op), op)
+                data = dic_to_json(Ndata)
+                client.send(data.encode('utf-8'))
+
+                Nmsg = client.recv(1024).decode('utf-8')
+                msg = json_to_dic(Nmsg)
+                print(msg["WHAT"])
+                
+                new = input()
+                Odata = new_client.Protocole(host, assign_ip(), type(new), new)
+                data = dic_to_json(Odata)
+                client.send(data.encode('utf-8'))
+
+                msg = client.recv(1024).decode('utf-8')
+                Nmsg = json_to_dic(msg)
+                print(Nmsg["WHAT"])
+                
+            
+            elif op == "5": #change Gender
+                Ndata = new_client.Protocole(host, assign_ip(), type(op), op)
+                data = dic_to_json(Ndata)
+                client.send(data.encode('utf-8'))
+
+                Nmsg = client.recv(1024).decode('utf-8')
+                msg = json_to_dic(Nmsg)
+                print(msg["WHAT"])
+                
+                new = input()
+                Odata = new_client.Protocole(host, assign_ip(), type(new), new)
+                data = dic_to_json(Odata)
+                client.send(data.encode('utf-8'))
+
+                msg = client.recv(1024).decode('utf-8')
+                Nmsg = json_to_dic(msg)
+                print(Nmsg["WHAT"])
+                
+            
+            elif op == "6": #change Email
+                Ndata = new_client.Protocole(host, assign_ip(), type(op), op)
+                data = dic_to_json(Ndata)
+                client.send(data.encode('utf-8'))
+
+                Nmsg = client.recv(1024).decode('utf-8')
+                msg = json_to_dic(Nmsg)
+                print(msg["WHAT"])
+                
+                new = input()
+                Odata = new_client.Protocole(host, assign_ip(), type(new), new)
+                data = dic_to_json(Odata)
+                client.send(data.encode('utf-8'))
+
+                msg = client.recv(1024).decode('utf-8')
+                Nmsg = json_to_dic(msg)
+                print(Nmsg["WHAT"])
+                
+            
+            elif op == "7": #change Country
+                Ndata = new_client.Protocole(host, assign_ip(), type(op), op)
+                data = dic_to_json(Ndata)
+                client.send(data.encode('utf-8'))
+
+                Nmsg = client.recv(1024).decode('utf-8')
+                msg = json_to_dic(Nmsg)
+                print(msg["WHAT"])
+                
+                new = input()
+                Odata = new_client.Protocole(host, assign_ip(), type(new), new)
+                data = dic_to_json(Odata)
+                client.send(data.encode('utf-8'))
+
+                msg = client.recv(1024).decode('utf-8')
+                Nmsg = json_to_dic(msg)
+                print(Nmsg["WHAT"])
+                
+            
+            elif op == "8": #change City
+                Ndata = new_client.Protocole(host, assign_ip(), type(op), op)
+                data = dic_to_json(Ndata)
+                client.send(data.encode('utf-8'))
+
+                Nmsg = client.recv(1024).decode('utf-8')
+                msg = json_to_dic(Nmsg)
+                print(msg["WHAT"])
+                
+                new = input()
+                Odata = new_client.Protocole(host, assign_ip(), type(new), new)
+                data = dic_to_json(Odata)
+                client.send(data.encode('utf-8'))
+
+                msg = client.recv(1024).decode('utf-8')
+                Nmsg = json_to_dic(msg)
+                print(Nmsg["WHAT"])
+                
+            
+            elif op == "9": #change Address
+                Ndata = new_client.Protocole(host, assign_ip(), type(op), op)
+                data = dic_to_json(Ndata)
+                client.send(data.encode('utf-8'))
+
+                Nmsg = client.recv(1024).decode('utf-8')
+                msg = json_to_dic(Nmsg)
+                print(msg["WHAT"])
+                
+                new = input()
+                Odata = new_client.Protocole(host, assign_ip(), type(new), new)
+                data = dic_to_json(Odata)
+                client.send(data.encode('utf-8'))
+
+                msg = client.recv(1024).decode('utf-8')
+                Nmsg = json_to_dic(msg)
+                print(Nmsg["WHAT"])
+                
+            
+            elif op == "10": #change Phone
+                Ndata = new_client.Protocole(host, assign_ip(), type(op), op)
+                data = dic_to_json(Ndata)
+                client.send(data.encode('utf-8'))
+
+                Nmsg = client.recv(1024).decode('utf-8')
+                msg = json_to_dic(Nmsg)
+                print(msg["WHAT"])
+                
+                new = input()
+                Odata = new_client.Protocole(host, assign_ip(), type(new), new)
+                data = dic_to_json(Odata)
+                client.send(data.encode('utf-8'))
+
+                msg = client.recv(1024).decode('utf-8')
+                Nmsg = json_to_dic(msg)
+                print(Nmsg["WHAT"])
+                
+            
+            elif op == "11": #change Class ID
+                Ndata = new_client.Protocole(host, assign_ip(), type(op), op)
+                data = dic_to_json(Ndata)
+                client.send(data.encode('utf-8'))
+
+                Nmsg = client.recv(1024).decode('utf-8')
+                msg = json_to_dic(Nmsg)
+                print(msg["WHAT"])
+                
+                new = input()
+                Odata = new_client.Protocole(host, assign_ip(), type(new), new)
+                data = dic_to_json(Odata)
+                client.send(data.encode('utf-8'))
+
+                msg = client.recv(1024).decode('utf-8')
+                Nmsg = json_to_dic(msg)
+                print(Nmsg["WHAT"])
+                
+            
+            elif op == "12": #exit
+                Ndata = new_client.Protocole(host, assign_ip(), type(op), op)
+                data = dic_to_json(Ndata)
+                client.send(data.encode('utf-8'))
+                return False
 
 def ListSTD():
     dic_message = client.recv(1024).decode()
-    message = json_to_dic(dic_message)
-    print(message["WHAT"])
-    while True:
-        lvl = input("")
-        if lvl in ['1','2','3']:    
-            dic_lvl = new_client.Protocole(host, assign_ip(), type(lvl), lvl)
-            lvl = dic_to_json(dic_lvl)
-            client.send(lvl.encode('utf-8'))
-            dic_list_std = client.recv(1024).decode('utf-8')
-            list_std = json_to_dic(dic_list_std)
-            print(list_std["WHAT"])
-            return
-        else:
-            print("[ERROR!] Enter A Valid Number !")           
+    msg = json_to_dic(dic_message)
+
+    new_msg = msg["WHAT"]
+    
+    new_data = [new_msg[1:-1]]
+
+    data = ast.literal_eval(new_data[0])
+
+    new_data = []
+
+    for records in data:
+        (Massar_ID, First_name, Last_name, Birthdate, Gender, Email, Country, City, Address, Phone, Class_id) = records
+        
+        date = unix_to_formatted(Birthdate)
+        
+        up_records = (Massar_ID, First_name, Last_name, date, Gender, Email, Country, City, Address, Phone, Class_id)
+
+        new_data.append(up_records)
+        
+
+    headers = ["Massar_ID", "First_name", "Last_name", "Birthdate", "Gender", "Email", "Country", "City", "Address", "Parent_Phone", "Class_ID"]
+
+    print(tabulate(new_data, headers=headers, tablefmt="grid"))
 
 def SearchSTD():
-    #receive msg to indicate level
-    dic_msg = client.recv(1024).decode('utf-8')
-    msg = json_to_dic(dic_msg)
+
+    #receive text to enter masarcode
+    json_msg = client.recv(1024).decode('utf-8')
+    msg = json_to_dic(json_msg)
     print(msg["WHAT"])
 
-    while True:
-        lvl = input("")
-        if lvl in ['1','2','3']:
-            dic_msg = new_client.Protocole(assign_ip(), host, type(lvl), lvl)
-            msg = dic_to_json(dic_msg)    
-            client.send(msg.encode('utf-8'))
+    M_code = input("")
+    dic_msg = new_client.Protocole(assign_ip(), host, type(M_code), M_code)
+    msg = dic_to_json(dic_msg)
+    client.send(msg.encode('utf-8'))
 
-            #receive
-            json_msg = client.recv(1024).decode('utf-8')
-            msg = json_to_dic(json_msg)
-            print(msg["WHAT"])
+    json_M_code = client.recv(1024).decode('utf-8')
+    M_code = json_to_dic(json_M_code)
 
-            M_code = input("")
-            dic_msg = new_client.Protocole(assign_ip(), host, type(M_code), M_code)
-            msg = dic_to_json(dic_msg)
-            client.send(msg.encode('utf-8'))
-
-            json_M_code = client.recv(1024).decode('utf-8')
-            M_code = json_to_dic(json_M_code)
-
-            if M_code["WHAT"] == "[ERROR!]: MassarCode Not Found !":
-                print("[ERROR!]: MassarCode Not Found !")
-                return
-
-            print("************************************")
-            print(M_code["WHAT"].strip())
-            print("************************************")
-            return
-        else:
-            print("[ERROR!] Enter A valid Number !")
+    if M_code["WHAT"] == "[ERROR!]: MassarCode Not Found !":
+        print("[ERROR!]: MassarCode Not Found !")
+        return
+    else:
+    
+        data = ast.literal_eval(M_code["WHAT"])
+        
+        headers = ["Massar_ID", "First_name", "Last_name", "Birthdate", "Gender", "Email", "Country", "City", "Address", "Parent_Phone", "Class_ID"]
+        print(tabulate(data, headers=headers, tablefmt="grid"))
+    
+    return
 
 def recv_menu():
     

@@ -4,6 +4,11 @@ import ssl
 import os
 import json
 import random
+import mysql.connector
+from datetime import datetime
+
+unix_to_formatted = lambda x: datetime.fromtimestamp(x).strftime('%Y/%m/%d')
+formatted_to_unix = lambda x: int(datetime.strptime(x, '%Y/%m/%d').timestamp())
 
 
 class protocole:
@@ -83,8 +88,7 @@ class protocole:
                 msg = dic_to_json(data)
                 client.send(msg.encode('utf-8'))
                 return False                
-               
-       
+                  
 def assign_ip():
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     
@@ -110,26 +114,11 @@ def json_to_dic(msg):
     return new_msg
 
 def AddSTD(client):
-    level = "In which level the student is in : \n1- Common Core\n2- 1st Baccalaureate\n3- 2nd Baccalaureate"
-    dic_msg = new_client.Protocole(IP, get_client_IP(), type(level), level)
-    json_msg = dic_to_json(dic_msg)
-    client.send(json_msg.encode('utf-8'))
+    
+    if not con.is_connected():
+        con.reconnect()
 
-    json_choice = client.recv(1024).decode('utf-8')
-    choice = json_to_dic(json_choice)
 
-    if (choice["WHAT"] == "1"):
-        filepath = "/home/rayane/School/Common_Core"
-        
-    elif (choice["WHAT"] == "2"):
-        filepath = "/home/rayane/School/1st_Bac"
-        
-    elif (choice["WHAT"] == "3"):
-        filepath = "/home/rayane/School/2nd_Bac"
-        
-    else:
-        print("Error, enter a valid number\n")
-        return
     dic_msg = new_client.Protocole(IP, get_client_IP(), type("First Name: "), "First Name: ")
     json_msg = dic_to_json(dic_msg)
     client.send(json_msg.encode('utf-8'))
@@ -144,7 +133,7 @@ def AddSTD(client):
     json_Lname = client.recv(1024).decode('utf-8')
     Lname = json_to_dic(json_Lname)
     
-    dic_msg = new_client.Protocole(IP, get_client_IP(), type("Age: "), "Age: ")
+    dic_msg = new_client.Protocole(IP, get_client_IP(), type("Birthdate (YYYY/MM/DD): "), "Birthdate (YYYY/MM/DD): ")
     json_msg = dic_to_json(dic_msg)
     client.send(json_msg.encode('utf-8'))
 
@@ -158,73 +147,91 @@ def AddSTD(client):
     json_M_code = client.recv(1024).decode('utf-8')
     M_code= json_to_dic(json_M_code)
 
-    with open(filepath, "r") as fl:
-        for lines in fl:
-            if M_code["WHAT"] in lines:
-                error = "[ERROR] : This Massar code already exist !"
-                client.send(error.encode('utf-8'))
-                return
-            else:
-                continue
-    
-            
-    dic_msg = new_client.Protocole(IP, get_client_IP(), type("Past Year Degree: "), "Past Year Degree: ")
+    # I should add Check if Massar code already exists 
+
+    dic_msg = new_client.Protocole(IP, get_client_IP(), type("'M' or 'F' :"), " 'M' or 'F' :")
     json_msg = dic_to_json(dic_msg)
     client.send(json_msg.encode('utf-8'))
 
-    json_Degree = client.recv(1024).decode('utf-8')
-    Degree = json_to_dic(json_Degree)
+    json_Gender = client.recv(1024).decode('utf-8')
+    Gender = json_to_dic(json_Gender)
 
-    dic_msg = new_client.Protocole(IP, get_client_IP(), type("Sector: "), "Sector: ")
+    dic_msg = new_client.Protocole(IP, get_client_IP(), type("Email: "), "Email: ")
     json_msg = dic_to_json(dic_msg)
     client.send(json_msg.encode('utf-8'))
 
-    json_Sec = client.recv(1024).decode('utf-8')
-    Sec = json_to_dic(json_Sec)
+    json_Email = client.recv(1024).decode('utf-8')
+    Email = json_to_dic(json_Email)
 
-    data = "First name: {Fname}\t Last name: {Lname}\t Age: {Age}\t MassarCode: {M_code}\t\t Past year degree: {Degree:.2f}\t Sector: {Sec}\n"
-    
-    file = open(filepath, "a")
-    file.write(data.format(Fname=Fname["WHAT"], Lname=Lname["WHAT"], Age=Age["WHAT"], M_code=M_code["WHAT"], Degree=float(Degree["WHAT"]), Sec=Sec["WHAT"]))
-
-    dic_msg = new_client.Protocole(IP, get_client_IP(), type("[SUCCESS!]: Student Added Sucessffuly "), "[SUCCESS!]: Student Added Sucessffuly ")
+    dic_msg = new_client.Protocole(IP, get_client_IP(), type("Country: "), "Country: ")
     json_msg = dic_to_json(dic_msg)
     client.send(json_msg.encode('utf-8'))
-    return
 
-def ListSTD(client):
-    level = "In which level the student is in : 1- Common Core\t2- 1st Baccalaureate\t3- 2nd Baccalaureate"
-    dic_msg = new_client.Protocole(IP, get_client_IP(), type(level), level)
+    json_Country = client.recv(1024).decode('utf-8')
+    Country = json_to_dic(json_Country)
+
+    dic_msg = new_client.Protocole(IP, get_client_IP(), type("City: "), "City: ")
     json_msg = dic_to_json(dic_msg)
     client.send(json_msg.encode('utf-8'))
-    json_lvl = client.recv(1024).decode('utf-8')
-    lvl = json_to_dic(json_lvl)
-    
-    if lvl["WHAT"] == '1':
-        filepath = "/home/rayane/School/Common_Core"
-    
-    elif lvl["WHAT"] == '2':
-        filepath = "/home/rayane/School/1st_Bac"
+
+    json_City = client.recv(1024).decode('utf-8')
+    City = json_to_dic(json_City)
+
+    dic_msg = new_client.Protocole(IP, get_client_IP(), type("Address: "), "Address: ")
+    json_msg = dic_to_json(dic_msg)
+    client.send(json_msg.encode('utf-8'))
+
+    json_Address = client.recv(1024).decode('utf-8')
+    Address = json_to_dic(json_Address)
+
+    dic_msg = new_client.Protocole(IP, get_client_IP(), type("Phone: "), "Phone: ")
+    json_msg = dic_to_json(dic_msg)
+    client.send(json_msg.encode('utf-8'))
+
+    json_Phone = client.recv(1024).decode('utf-8')
+    Phone = json_to_dic(json_Phone)
+
+    dic_msg = new_client.Protocole(IP, get_client_IP(), type("Class ID: "), "Class ID: ")
+    json_msg = dic_to_json(dic_msg)
+    client.send(json_msg.encode('utf-8'))
+
+    json_ClassID = client.recv(1024).decode('utf-8')
+    ClassID = json_to_dic(json_ClassID)
+
+    date = formatted_to_unix(Age["WHAT"])
+
+    try:
+        cursor.execute('''INSERT INTO Students (Massar_ID, First_name, Last_name, Birthdate, Gender, Email , Country, City, Address, Parent_Phone, Class_ID)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)''', (M_code["WHAT"], Fname["WHAT"], Lname["WHAT"], date, Gender["WHAT"], Email["WHAT"], Country["WHAT"], City["WHAT"], Address["WHAT"], Phone["WHAT"], ClassID["WHAT"]))
         
-    elif lvl["WHAT"] == '3':
-        filepath = "/home/rayane/School/2nd_Bac"
-    
-    with open (filepath, "r") as file:
-        lines = file.read()
-        dic_msg = new_client.Protocole(IP, get_client_IP(), type(lines), lines)
+        con.commit()
+        cursor.close()
+        con.close()
+
+        dic_msg = new_client.Protocole(IP, get_client_IP(), type("[SUCCESS!]: Student Added Sucessffuly "), "[SUCCESS!]: Student Added Sucessffuly ")
         json_msg = dic_to_json(dic_msg)
         client.send(json_msg.encode('utf-8'))
         return
-        
-def SearchSTD(client):
-    code = False
-    level = "In which level the student is in : 1- Common Core\t2- 1st Baccalaureate\t3- 2nd Baccalaureate"
-    dic_msg = new_client.Protocole(IP, get_client_IP(), type(level), level)
-    msg = dic_to_json(dic_msg)
+    except Exception as e:
+        print(f"User {addr[0]} ON {addr[1]} Encountred the Following ERROR : {e}")
+
+def ListSTD(client):
+
+    if not con.is_connected():
+        con.reconnect()
+
+    cursor.execute("SELECT * FROM Students")
+    data =  cursor.fetchall()
+
+    Msg = new_client.Protocole(IP, get_client_IP(), type(data), data)
+    msg = dic_to_json(Msg)
     client.send(msg.encode('utf-8'))
 
-    json_lvl = client.recv(1024).decode('utf-8')
-    lvl = json_to_dic(json_lvl)
+    con.commit()
+    cursor.close()
+    con.close()
+
+def SearchSTD(client):
 
     Mcode = "MassarCode: "
     dic_msg = new_client.Protocole(IP, get_client_IP(), type(Mcode), Mcode)
@@ -233,38 +240,24 @@ def SearchSTD(client):
 
     json_M_code = client.recv(1024).decode('utf-8')
     M_code = json_to_dic(json_M_code)
-
-    if lvl["WHAT"] == '1':
-        filepath = "/home/rayane/School/Common_Core"   
     
-    elif lvl["WHAT"] == '2':
-        filepath = "/home/rayane/School/1st_Bac"
-
-    elif lvl["WHAT"] == '3':
-        filepath = "/home/rayane/School/2nd_Bac"
-        
-    with open (filepath, "r") as file:
-        for lines in file:
-            if M_code["WHAT"] in lines:
-                code = True
-                dic_msg = new_client.Protocole(IP, get_client_IP(), type(lines), lines)
-                msg = dic_to_json(dic_msg)
-                client.send(msg.encode('utf-8'))
-        if code == False:
-            dic_msg = new_client.Protocole(IP, get_client_IP(), type("[ERROR!]: MassarCode Not Found !"), "[ERROR!]: MassarCode Not Found !")
-            msg = dic_to_json(dic_msg)
-            client.send(msg.encode('utf-8'))
-            return
-        return            
+    msg = [M_code["WHAT"]]
+    cursor.execute('''SELECT * FROM Students WHERE Massar_ID = %s''',msg)
+    data = cursor.fetchall()
     
+    if data:
+        msg = new_client.Protocole(IP, get_client_IP(), type(data), data)
+        MSG = dic_to_json(msg)
+        client.send(MSG.encode('utf-8'))
+    else:
+        msg = new_client.Protocole(IP, get_client_IP(), type("[ERROR!]: MassarCode Not Found !"), "[ERROR!]: MassarCode Not Found !")
+        MSG = dic_to_json(msg)
+        client.send(MSG.encode('utf-8'))
+   
 def DelSTD(client):
-    level = "In which level the student is in : 1- Common Core\t2- 1st Baccalaureate\t3- 2nd Baccalaureate"
-    dic_msg = new_client.Protocole(IP, get_client_IP(), type(level), level)
-    json_msg = dic_to_json(dic_msg)
-    client.send(json_msg.encode('utf-8'))
 
-    json_lvl = client.recv(1024).decode('utf-8')
-    lvl = json_to_dic(json_lvl)
+    if not con.is_connected():
+        con.reconnect()
 
     Mcode = "MassarCode: "
     dic_msg = new_client.Protocole(IP, get_client_IP(), type(Mcode), Mcode)
@@ -274,161 +267,428 @@ def DelSTD(client):
     m_code = client.recv(1024).decode('utf-8')
     M_code = json_to_dic(m_code)
 
-    if lvl["WHAT"] == '1':
-        Massar = False
-        filepath = "/home/rayane/School/Common_Core"
-        
-    
-    elif lvl["WHAT"] == '2':
-        Massar = False
-        filepath = "/home/rayane/School/1st_Bac"
-        
+    cursor.execute('''SELECT * FROM Students WHERE Massar_ID = %s''', (M_code["WHAT"],))
+    result = cursor.fetchall()
 
-    elif lvl["WHAT"] == '3':
-        Massar = False
-        filepath = "/home/rayane/School/2nd_Bac"
-        
-    with open (filepath, "r") as file:
-        for lines in file:
-            if M_code["WHAT"] in lines:
-                Massar = True
-        if Massar:
-            temp = ""
-            
-            with open (filepath, "r") as file:
-                for lines in file:
-                    if M_code["WHAT"] not in lines:
-                        temp += lines
+    if result:    
+        cursor.execute('''DELETE FROM Students WHERE Massar_ID = %s''', (M_code["WHAT"],))
+        msg = "[SUCCESS!] Student Deleted Successfully"
+        odata = new_client.Protocole(IP, get_client_IP(), type(msg), msg)
+        data = dic_to_json(odata)
+        client.send(data.encode('utf-8'))
 
-            with open (filepath, "w") as file:
-                file.write(temp)
-
-            succes_msg = new_client.Protocole(IP, get_client_IP(), type("Student Deleted Sucessfuly !"), "Student Deleted Sucessfuly !")
-            json_suc_msg = dic_to_json(succes_msg)
-            client.send(json_suc_msg.encode('utf-8'))
-    
-        else:
-            client.send("[ERROR!]: MassarCode Not Found !".encode('utf-8'))
-            return
+        con.commit()
+        cursor.close()
+        con.close()
+    else:
+        msg = "[ERROR!]: MassarCode Not Found !"
+        odata = new_client.Protocole(IP, get_client_IP(), type(msg), msg)
+        data = dic_to_json(odata)
+        client.send(data.encode('utf-8'))
+        return
     return   
 
 def ModSTD(client):
-    code = False
-    temp = ""
-    level = "In which level the student is in : 1- Common Core\t2- 1st Baccalaureate\t3- 2nd Baccalaureate"
-    dic_msg = new_client.Protocole(IP, get_client_IP(), type(level), level)
-    level = dic_to_json(dic_msg)
-    client.send(level.encode('utf-8'))
-
-    json_lvl = client.recv(1024).decode('utf-8')
-    lvl = json_to_dic(json_lvl)
+     
     Mcode = "MassarCode: "
     dic_Mcode = new_client.Protocole(IP, get_client_IP(), type(Mcode), Mcode)
     Mcode = dic_to_json(dic_Mcode)
     client.send(Mcode.encode('utf-8'))
 
     json_M_code = client.recv(1024).decode('utf-8')
-    M_code = json_to_dic(json_M_code)
+    Origi_M_code = json_to_dic(json_M_code)
 
-    if lvl["WHAT"] == '1':
-        filepath = "/home/rayane/School/Common_Core"
-    
-    elif lvl["WHAT"] == '2':
-        filepath = "/home/rayane/School/1st_Bac"
+    cursor.execute('''SELECT * FROM Students WHERE Massar_ID = %s''', (Origi_M_code["WHAT"],))
+
+    data = cursor.fetchall()
+
+    if data:
+        msg = new_client.Protocole(IP, get_client_IP(), type("Change all student data (1) Choose what to change (2)"), "Change all student data (1) Choose what to change (2)")
+        Nmsg = dic_to_json(msg)
+        client.send(Nmsg.encode('utf-8'))
+
+        data = client.recv(1024).decode('utf-8')
+        Ndata = json_to_dic(data)
+
         
-    elif lvl["WHAT"] == '3':
-        filepath = "/home/rayane/School/2nd_Bac"
-    
-    with open(filepath, "r") as file:
-        for lines in file:
-            if M_code["WHAT"] not in lines:
-                temp += lines
+        if Ndata["WHAT"] == "1":
+            dic_msg = new_client.Protocole(IP, get_client_IP(), type("First Name: "), "First Name: ")
+            json_msg = dic_to_json(dic_msg)
+            client.send(json_msg.encode('utf-8'))
 
-        with open (filepath, "r") as file:
-            for lines in file:
-                if M_code["WHAT"] in lines:
-                    dic_msg = new_client.Protocole(IP, get_client_IP(), type(lines), lines)
-                    json_msg = dic_to_json(dic_msg)
-                    client.send(json_msg.encode('utf-8'))
-                    code = True
+            json_Fname = client.recv(1024).decode('utf-8')
+            Fname = json_to_dic(json_Fname)
+
+            dic_msg = new_client.Protocole(IP, get_client_IP(), type("Last Name: "), "Last Name: ")
+            json_msg = dic_to_json(dic_msg)
+            client.send(json_msg.encode('utf-8'))
+
+            json_Lname = client.recv(1024).decode('utf-8')
+            Lname = json_to_dic(json_Lname)
+            
+            dic_msg = new_client.Protocole(IP, get_client_IP(), type("Birthdate (YYYY/MM/DD): "), "Birthdate (YYYY/MM/DD): ")
+            json_msg = dic_to_json(dic_msg)
+            client.send(json_msg.encode('utf-8'))
+
+            json_Age = client.recv(1024).decode('utf-8')
+            Age = json_to_dic(json_Age)
+
+            dic_msg = new_client.Protocole(IP, get_client_IP(), type("Massar Code: "), "Massar Code: ")
+            json_msg = dic_to_json(dic_msg)
+            client.send(json_msg.encode('utf-8'))
+
+            json_M_code = client.recv(1024).decode('utf-8')
+            M_code= json_to_dic(json_M_code)
+
+            # I should add Check if Massar code already exists 
+
+            dic_msg = new_client.Protocole(IP, get_client_IP(), type("'M' or 'F' :"), " 'M' or 'F' :")
+            json_msg = dic_to_json(dic_msg)
+            client.send(json_msg.encode('utf-8'))
+
+            json_Gender = client.recv(1024).decode('utf-8')
+            Gender = json_to_dic(json_Gender)
+
+            dic_msg = new_client.Protocole(IP, get_client_IP(), type("Email: "), "Email: ")
+            json_msg = dic_to_json(dic_msg)
+            client.send(json_msg.encode('utf-8'))
+
+            json_Email = client.recv(1024).decode('utf-8')
+            Email = json_to_dic(json_Email)
+
+            dic_msg = new_client.Protocole(IP, get_client_IP(), type("Country: "), "Country: ")
+            json_msg = dic_to_json(dic_msg)
+            client.send(json_msg.encode('utf-8'))
+
+            json_Country = client.recv(1024).decode('utf-8')
+            Country = json_to_dic(json_Country)
+
+            dic_msg = new_client.Protocole(IP, get_client_IP(), type("City: "), "City: ")
+            json_msg = dic_to_json(dic_msg)
+            client.send(json_msg.encode('utf-8'))
+
+            json_City = client.recv(1024).decode('utf-8')
+            City = json_to_dic(json_City)
+
+            dic_msg = new_client.Protocole(IP, get_client_IP(), type("Address: "), "Address: ")
+            json_msg = dic_to_json(dic_msg)
+            client.send(json_msg.encode('utf-8'))
+
+            json_Address = client.recv(1024).decode('utf-8')
+            Address = json_to_dic(json_Address)
+
+            dic_msg = new_client.Protocole(IP, get_client_IP(), type("Phone: "), "Phone: ")
+            json_msg = dic_to_json(dic_msg)
+            client.send(json_msg.encode('utf-8'))
+
+            json_Phone = client.recv(1024).decode('utf-8')
+            Phone = json_to_dic(json_Phone)
+
+            dic_msg = new_client.Protocole(IP, get_client_IP(), type("Class ID: "), "Class ID: ")
+            json_msg = dic_to_json(dic_msg)
+            client.send(json_msg.encode('utf-8'))
+
+            json_ClassID = client.recv(1024).decode('utf-8')
+            ClassID = json_to_dic(json_ClassID)
+
+            date = formatted_to_unix(Age["WHAT"])
+
+            cursor.execute('''UPDATE Students
+                SET Massar_ID = %s,
+                    First_name = %s,
+                    Last_name = %s,
+                    Birthdate = %s,
+                    Gender = %s,
+                    Email = %s,
+                    Country = %s,
+                    City = %s,
+                    Address = %s,
+                    Parent_Phone = %s,
+                    Class_ID = %s
+                WHERE Massar_ID = %s;''', (M_code["WHAT"], Fname["WHAT"], Lname["WHAT"], date, Gender["WHAT"], Email["WHAT"], Country["WHAT"], City["WHAT"], Address["WHAT"], Phone["WHAT"], ClassID["WHAT"], Origi_M_code["WHAT"]))
+            
+            con.commit()
+            cursor.close()
+            con.close()
+
+            msg = new_client.Protocole(IP, get_client_IP(), type("Update successful"), "Update successful")
+            Nmsg = dic_to_json(msg)
+            client.send(Nmsg.encode('utf-8'))
+
+        elif Ndata["WHAT"] == "2":
+            while True:
+                data = """Please select an operation by entering the corresponding number:
+        1. Change Massar_ID
+        2. Change First_name
+        3. Change Last_name
+        4. Change Birthdate
+        5. Change Gender
+        6. Change Email
+        7. Change Country
+        8. Change City
+        9. Change Address
+        10. Change Parent_Phone
+        11. Change Class_ID
+        12. Exit
+        """
+                msg = new_client.Protocole(IP, get_client_IP(), type(data), data)
+                Nmsg = dic_to_json(msg)
+                client.send(Nmsg.encode('utf-8'))
+
+                Nmsg = client.recv(2014).decode('utf-8')
+                msg = json_to_dic(Nmsg)
+
+
+                if msg["WHAT"] == "1": #change Massar
+                    msg = new_client.Protocole(IP, get_client_IP(), type("Enter New Massar_ID"), "Enter New Massar_ID")
+                    Nmsg = dic_to_json(msg)
+                    client.send(Nmsg.encode('utf-8'))
+                    
+                    msg = client.recv(1024).decode('utf-8')
+                    Nmsg = json_to_dic(msg)
+
+                    try:
+                        cursor.execute('''UPDATE Students SET Massar_ID = %s WHERE Massar_ID = %s;''', (Nmsg["WHAT"], Origi_M_code["WHAT"]))
+                        con.commit()
+                        msg = new_client.Protocole(IP, get_client_IP(), type("Massar_ID updated successfully"), "Massar_ID updated successfully")
+                        Nmsg = dic_to_json(msg)
+                        client.send(Nmsg.encode('utf-8'))
+
+                    except Exception as e:
+                        Nmsg = new_client.Protocole(IP, assign_ip(), type("Error Applying Changes"), "Error Applying Changes")
+                        msg = dic_to_json(Nmsg)
+                        client.send(msg.encode('utf-8'))
+                        print(f"[ERROR]: {e}")
                     
                 
+                elif msg["WHAT"] == "2": #change first name
+                    msg = new_client.Protocole(IP, get_client_IP(), type("Enter New First Name"), "Enter New First Name")
+                    Nmsg = dic_to_json(msg)
+                    client.send(Nmsg.encode('utf-8'))
+                    
+                    msg = client.recv(1024).decode('utf-8')
+                    Nmsg = json_to_dic(msg)
 
-        if code:            
-            #FIRST NAME
-            dic_msg = new_client.Protocole(IP, get_client_IP(), type("First Name: "), "First Name: ")
-            msg = dic_to_json(dic_msg)
-            client.send(msg.encode('utf-8'))
+                    try:
+                        cursor.execute('''UPDATE Students SET First_name = %s WHERE Massar_ID = %s;''', (Nmsg["WHAT"], Origi_M_code["WHAT"]))
+                        con.commit()
+                        msg = new_client.Protocole(IP, get_client_IP(), type("First name updated successfully"), "First name updated successfully")
+                        Nmsg = dic_to_json(msg)
+                        client.send(Nmsg.encode('utf-8'))
+                    except Exception as e:
+                        Nmsg = new_client.Protocole(IP, assign_ip(), type("Error Applying Changes"), "Error Applying Changes")
+                        msg = dic_to_json(Nmsg)
+                        client.send(msg.encode('utf-8'))
+                        print(f"[ERROR]: {e}")
+                    
 
-            json_New_Fname = client.recv(1024).decode('utf-8')
-            New_Fname = json_to_dic(json_New_Fname)
-            
-            #LAST NAME
-            dic_msg = new_client.Protocole(IP, get_client_IP(), type("Last Name: "), "Last Name: ")
-            msg = dic_to_json(dic_msg)
-            client.send(msg.encode('utf-8'))
+                elif msg["WHAT"] == "3": #change last name
+                    msg = new_client.Protocole(IP, get_client_IP(), type("Enter New Last Name"), "Enter New Last Name")
+                    Nmsg = dic_to_json(msg)
+                    client.send(Nmsg.encode('utf-8'))
+                    
+                    msg = client.recv(1024).decode('utf-8')
+                    Nmsg = json_to_dic(msg)
 
-            json_New_Lname = client.recv(1024).decode('utf-8')
-            New_Lname = json_to_dic(json_New_Lname)
+                    try:
+                        cursor.execute('''UPDATE Students SET Last_name = %s WHERE Massar_ID = %s;''', (Nmsg["WHAT"], Origi_M_code["WHAT"]))
+                        con.commit()
+                        msg = new_client.Protocole(IP, get_client_IP(), type("Last name updated successfully"), "Last name updated successfully")
+                        Nmsg = dic_to_json(msg)
+                        client.send(Nmsg.encode('utf-8'))
+                    except Exception as e:
+                        Nmsg = new_client.Protocole(IP, assign_ip(), type("Error Applying Changes"), "Error Applying Changes")
+                        msg = dic_to_json(Nmsg)
+                        client.send(msg.encode('utf-8'))
+                        print(f"[ERROR]: {e}")
+                    
 
-            #AGE
-            dic_msg = new_client.Protocole(IP, get_client_IP(), type("Age: "), "Age: ")
-            msg = dic_to_json(dic_msg)
-            client.send(msg.encode('utf-8'))
+                elif msg["WHAT"] == "4": #change birthdate
+                    msg = new_client.Protocole(IP, get_client_IP(), type("Enter Birthdate"), "Enter Birthdate")
+                    Nmsg = dic_to_json(msg)
+                    client.send(Nmsg.encode('utf-8'))
+                    
+                    msg = client.recv(1024).decode('utf-8')
+                    data = json_to_dic(msg)
 
-            json_New_Age = client.recv(1024).decode('utf-8')
-            New_Age = json_to_dic(json_New_Age)
+                    Nmsg = formatted_to_unix(data["WHAT"])
 
-            #MASSAR_CODE
-            dic_msg = new_client.Protocole(IP, get_client_IP(), type("MassarCode: "), "MassarCode: ")
-            msg = dic_to_json(dic_msg)
-            client.send(msg.encode('utf-8'))
+                    try:
+                        cursor.execute('''UPDATE Students SET Birthdate = %s WHERE Massar_ID = %s;''', (Nmsg, Origi_M_code["WHAT"]))
+                        con.commit()
+                        msg = new_client.Protocole(IP, get_client_IP(), type("Birthdate updated successfully"), "Birthdate updated successfully")
+                        Nmsg = dic_to_json(msg)
+                        client.send(Nmsg.encode('utf-8'))
 
-            json_New_M_code = client.recv(1024).decode('utf-8')
-            New_M_code = json_to_dic(json_New_M_code)
+                    except Exception as e:
+                        Nmsg = new_client.Protocole(IP, assign_ip(), type("Error Applying Changes"), "Error Applying Changes")
+                        msg = dic_to_json(Nmsg)
+                        client.send(msg.encode('utf-8'))
+                        print(f"[ERROR]: {e}")
+                    
 
-            with open(filepath, "r") as file:
-                for lines in file:
-                    if New_M_code["WHAT"] == M_code["WHAT"]:
-                        continue
-                    elif New_M_code["WHAT"] in lines:
-                        code = True
-                        dic_msg = new_client.Protocole(IP, get_client_IP(), type("[ERROR!] This MassarCode is present: "), "[ERROR!] This MassarCode is present: ")
-                        msg = dic_to_json(dic_msg)
-                        client.send(msg.encode('utf-8')) 
-                        return
-            
-            dic_msg = new_client.Protocole(IP, get_client_IP(), type("Past Year Degree: "), "Past Year Degree: ")
-            msg = dic_to_json(dic_msg)
-            client.send(msg.encode('utf-8'))
+                elif msg["WHAT"] == "5": #change Gender
+                    msg = new_client.Protocole(IP, get_client_IP(), type("Enter Gender"), "Enter Gender")
+                    Nmsg = dic_to_json(msg)
+                    client.send(Nmsg.encode('utf-8'))
+                    
+                    msg = client.recv(1024).decode('utf-8')
+                    Nmsg = json_to_dic(msg)
 
-            json_New_Degree = client.recv(1024).decode('utf-8')
-            New_Degree = json_to_dic(json_New_Degree)
+                    try:
+                        cursor.execute('''UPDATE Students SET Gender = %s WHERE Massar_ID = %s;''', (Nmsg["WHAT"], Origi_M_code["WHAT"]))
+                        con.commit()
+                        msg = new_client.Protocole(IP, get_client_IP(), type("Gender updated successfully"), "Gender updated successfully")
+                        Nmsg = dic_to_json(msg)
+                        client.send(Nmsg.encode('utf-8'))
 
-            dic_msg = new_client.Protocole(IP, get_client_IP(), type("Sector: "), "Sector: ")
-            msg = dic_to_json(dic_msg)
-            client.send(msg.encode('utf-8'))
+                    except Exception as e:
+                        Nmsg = new_client.Protocole(IP, assign_ip(), type("Error Applying Changes"), "Error Applying Changes")
+                        msg = dic_to_json(Nmsg)
+                        client.send(msg.encode('utf-8'))
+                        print(f"[ERROR]: {e}")
+                    
 
-            json_New_Sector = client.recv(1024).decode('utf-8')
-            New_Sector = json_to_dic(json_New_Sector)
+                elif msg["WHAT"] == "6": #change Email
+                    msg = new_client.Protocole(IP, get_client_IP(), type("Enter New Email"), "Enter New Email")
+                    Nmsg = dic_to_json(msg)
+                    client.send(Nmsg.encode('utf-8'))
+                    
+                    msg = client.recv(1024).decode('utf-8')
+                    Nmsg = json_to_dic(msg)
 
-            data = "First name: {New_Fname}\t Last name: {New_Lname}\t Age: {New_Age}\t MassarCode: {New_M_code}\t\t Past year degree: {New_Degree:.2f}\t Sector: {New_Sector}\n"
+                    try:
+                        cursor.execute('''UPDATE Students SET Email = %s WHERE Massar_ID = %s;''', (Nmsg["WHAT"], Origi_M_code["WHAT"]))
+                        con.commit()
+                        msg = new_client.Protocole(IP, get_client_IP(), type("Email updated successfully"), "Email updated successfully")
+                        Nmsg = dic_to_json(msg)
+                        client.send(Nmsg.encode('utf-8'))
 
-            with open(filepath, "w") as file:
-                file.write(temp)
-            with open(filepath, "a") as file:
-                file.write(data.format(New_Fname=New_Fname["WHAT"], New_Lname=New_Lname["WHAT"], New_Age=New_Age["WHAT"], New_M_code=New_M_code["WHAT"], New_Degree=float(New_Degree["WHAT"]), New_Sector=New_Sector["WHAT"]))
+                    except Exception as e:
+                        Nmsg = new_client.Protocole(IP, assign_ip(), type("Error Applying Changes"), "Error Applying Changes")
+                        msg = dic_to_json(Nmsg)
+                        client.send(msg.encode('utf-8'))
+                        print(f"[ERROR]: {e}")
+                    
 
-            dic_msg = new_client.Protocole(IP, get_client_IP(), type("Student Modified successfuly"), "Student Modified successfuly")
-            msg = dic_to_json(dic_msg)
-            client.send(msg.encode('utf-8'))
+                elif msg["WHAT"] == "7": # Change Country
+                    msg = new_client.Protocole(IP, get_client_IP(), type("Enter New Country"), "Enter New Country")
+                    Nmsg = dic_to_json(msg)
+                    client.send(Nmsg.encode('utf-8'))
+                    
+                    msg = client.recv(1024).decode('utf-8')
+                    Nmsg = json_to_dic(msg)
 
-        else:
-            dic_msg = new_client.Protocole(IP, get_client_IP(), type("[ERROR!]: MassarCode Not Found !"), "[ERROR!]: MassarCode Not Found !")
-            msg = dic_to_json(dic_msg)
-            client.send(msg.encode('utf-8'))
-            return
-    return
+                    try:
+                        cursor.execute('''UPDATE Students SET Country = %s WHERE Massar_ID = %s;''', (Nmsg["WHAT"], Origi_M_code["WHAT"]))
+                        con.commit()
+                        msg = new_client.Protocole(IP, get_client_IP(), type("Country updated successfully"), "Country updated successfully")
+                        Nmsg = dic_to_json(msg)
+                        client.send(Nmsg.encode('utf-8'))
+
+                    except Exception as e:
+                        Nmsg = new_client.Protocole(IP, assign_ip(), type("Error Applying Changes"), "Error Applying Changes")
+                        msg = dic_to_json(Nmsg)
+                        client.send(msg.encode('utf-8'))
+                        print(f"[ERROR]: {e}")
+                    
+
+                elif msg["WHAT"] == "8":
+                    msg = new_client.Protocole(IP, get_client_IP(), type("Enter New City"), "Enter New City")
+                    Nmsg = dic_to_json(msg)
+                    client.send(Nmsg.encode('utf-8'))
+                    
+                    msg = client.recv(1024).decode('utf-8')
+                    Nmsg = json_to_dic(msg)
+
+                    try:
+                        cursor.execute('''UPDATE Students SET City = %s WHERE Massar_ID = %s;''', (Nmsg["WHAT"], Origi_M_code["WHAT"]))
+                        con.commit()
+                        msg = new_client.Protocole(IP, get_client_IP(), type("City updated successfully"), "City updated successfully")
+                        Nmsg = dic_to_json(msg)
+                        client.send(Nmsg.encode('utf-8'))
+
+                    except Exception as e:
+                        Nmsg = new_client.Protocole(IP, assign_ip(), type("Error Applying Changes"), "Error Applying Changes")
+                        msg = dic_to_json(Nmsg)
+                        client.send(msg.encode('utf-8'))
+                        print(f"[ERROR]: {e}")
+                    
+
+                elif msg["WHAT"] == "9":
+                    msg = new_client.Protocole(IP, get_client_IP(), type("Enter New Address"), "Enter New Address")
+                    Nmsg = dic_to_json(msg)
+                    client.send(Nmsg.encode('utf-8'))
+                    
+                    msg = client.recv(1024).decode('utf-8')
+                    Nmsg = json_to_dic(msg)
+
+                    try:
+                        cursor.execute('''UPDATE Students SET Address = %s WHERE Massar_ID = %s;''', (Nmsg["WHAT"], Origi_M_code["WHAT"]))
+                        con.commit()
+                        msg = new_client.Protocole(IP, get_client_IP(), type("Address updated successfully"), "Address updated successfully")
+                        Nmsg = dic_to_json(msg)
+                        client.send(Nmsg.encode('utf-8'))
+
+                    except Exception as e:
+                        Nmsg = new_client.Protocole(IP, assign_ip(), type("Error Applying Changes"), "Error Applying Changes")
+                        msg = dic_to_json(Nmsg)
+                        client.send(msg.encode('utf-8'))
+                        print(f"[ERROR]: {e}")
+
+
+                elif msg["WHAT"] == "10":
+                    msg = new_client.Protocole(IP, get_client_IP(), type("Enter New Phone"), "Enter New Phone")
+                    Nmsg = dic_to_json(msg)
+                    client.send(Nmsg.encode('utf-8'))
+                    
+                    msg = client.recv(1024).decode('utf-8')
+                    Nmsg = json_to_dic(msg)
+
+                    try:
+                        cursor.execute('''UPDATE Students SET Parent_Phone = %s WHERE Massar_ID = %s;''', (Nmsg["WHAT"], Origi_M_code["WHAT"]))
+                        con.commit()
+                        msg = new_client.Protocole(IP, get_client_IP(), type("Phone updated successfully"), "Phone updated successfully")
+                        Nmsg = dic_to_json(msg)
+                        client.send(Nmsg.encode('utf-8'))
+
+                    except Exception as e:
+                        Nmsg = new_client.Protocole(IP, assign_ip(), type("Error Applying Changes"), "Error Applying Changes")
+                        msg = dic_to_json(Nmsg)
+                        client.send(msg.encode('utf-8'))
+                        print(f"[ERROR]: {e}")
+                    
+
+                elif msg["WHAT"] == "11":
+                    msg = new_client.Protocole(IP, get_client_IP(), type("Enter New Class ID"), "Enter New Class ID")
+                    Nmsg = dic_to_json(msg)
+                    client.send(Nmsg.encode('utf-8'))
+                    
+                    msg = client.recv(1024).decode('utf-8')
+                    Nmsg = json_to_dic(msg)
+
+                    try:
+                        cursor.execute('''UPDATE Students SET Class_ID = %s WHERE Massar_ID = %s;''', (Nmsg["WHAT"], Origi_M_code["WHAT"]))
+                        con.commit()
+                        msg = new_client.Protocole(IP, get_client_IP(), type("Class ID updated successfully"), "Class ID updated successfully")
+                        Nmsg = dic_to_json(msg)
+                        client.send(Nmsg.encode('utf-8'))
+
+                    except Exception as e:
+                        Nmsg = new_client.Protocole(IP, assign_ip(), type("Error Applying Changes"), "Error Applying Changes")
+                        msg = dic_to_json(Nmsg)
+                        client.send(msg.encode('utf-8'))
+                        print(f"[ERROR]: {e}")
+                    
+                
+                elif msg["WHAT"] == "12": #exit
+                    return False
+                    
+    else:
+        msg = new_client.Protocole(IP, get_client_IP(), type("[ERROR] No Massar Code Found !"), "[ERROR] No Massar Code Found !")
+        Nmsg = dic_to_json(msg)
+        client.send(Nmsg.encode('utf-8'))
+        return
 
 def SendMenu(client, addr):
     
@@ -520,6 +780,11 @@ def handle_clients(client, addr):
     print(f"[NEW CONNECTION] {addr} Connected.")
     if is_auth(client):
         while True:
+            if not con.is_connected():
+                con.reconnect()
+            global cursor
+            cursor = con.cursor()
+
             try:
                 if not SendMenu(client, addr):
                     break  # Exit loop and disconnect if user chooses to exit
@@ -549,12 +814,24 @@ def main():
     
     # SSL context setup
     context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
-    context.load_cert_chain(certfile="/home/rayane/School/Students-Management/SSL/cert.pem", keyfile="/home/rayane/School/Students-Management/SSL/key.pem")
+    context.load_cert_chain(certfile="/home/rayane/projects/Students-Management/SSL/cert.pem", keyfile="/home/rayane/projects/Students-Management/SSL/key.pem")
 
     print(f"SERVER LISTENING ON PORT {port}")
 
     input_threads = threading.Thread(target=END_SERVER)
     input_threads.start()
+
+    global con
+    global cursor
+
+    con = mysql.connector.connect (
+        host = "127.0.0.1",
+        user = "root",
+        password = "Meliox7@2013.",
+        database = "School"
+    )
+
+    cursor = con.cursor()
 
     while True:
         
