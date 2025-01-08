@@ -21,25 +21,25 @@ class protocole:
     
     def authentication(self):
         
-        json_user_requ = client.recv(1024).decode('utf-8')
+        json_user_requ = conn.client.recv(1024).decode('utf-8')
         user_requ = json_to_dic(json_user_requ)
         print(user_requ["WHAT"])
 
         user = input()
-        user_dic_msg = new_client.Protocole(assign_ip(), host, type(user), user)
+        user_dic_msg = new_client.Protocole(assign_ip(), conn.host, type(user), user)
         user_msg = dic_to_json(user_dic_msg)
-        client.send(user_msg.encode("utf-8"))
+        conn.client.send(user_msg.encode("utf-8"))
         
-        json_pass_requ = client.recv(1024).decode('utf-8')
+        json_pass_requ = conn.client.recv(1024).decode('utf-8')
         pass_requ = json_to_dic(json_pass_requ)
         print(pass_requ["WHAT"])
         
         passwd = input()
-        passwd_dic_msg = new_client.Protocole(assign_ip(), host, type(passwd), passwd)
+        passwd_dic_msg = new_client.Protocole(assign_ip(), conn.host, type(passwd), passwd)
         passwd_msg = dic_to_json(passwd_dic_msg)
-        client.send(passwd_msg.encode("utf-8"))
+        conn.client.send(passwd_msg.encode("utf-8"))
         
-        msg = client.recv(1024).decode('utf-8')
+        msg = conn.client.recv(1024).decode('utf-8')
         d_msg = json_to_dic(msg)  
 
         
@@ -55,10 +55,30 @@ class protocole:
             print(d_msg["WHAT"])
             return  
 
-unix_to_formatted = lambda x: datetime.fromtimestamp(x).strftime('%Y/%m/%d')
-formatted_to_unix = lambda x: int(datetime.strptime(x, '%Y/%m/%d').timestamp())
+class connection:
+    def __init__(self, host, port):
+        self.host = host
+        self.port = port
+        self.client = None
 
-global new_client
+    def start_client(self):
+        sclient = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+        context = ssl.create_default_context()
+
+        context.check_hostname = False  # Disable hostname checking
+        context.verify_mode = ssl.CERT_NONE  # Disable certificate verification
+
+        host = self.host
+        port = self.port
+
+        self.client = context.wrap_socket(sclient, server_hostname=host)
+
+        conn = (host, port)
+
+        self.client.connect(conn)
+
+        print(f"[CONNECTED!] to server at {conn}")
 
 def assign_ip():
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -73,23 +93,11 @@ def assign_ip():
 
 new_client = protocole(assign_ip())
 
-sclient = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+conn = connection("192.168.1.117", 65301)
 
-context = ssl.create_default_context()
 
-context.check_hostname = False  # Disable hostname checking
-context.verify_mode = ssl.CERT_NONE  # Disable certificate verification
-
-host = "192.168.1.117"
-port = 65301
-
-client = context.wrap_socket(sclient, server_hostname=host)
-
-conn = (host, port)
-
-client.connect(conn)
-
-print(f"[CONNECTED!] to server at {conn}")
+unix_to_formatted = lambda x: datetime.fromtimestamp(x).strftime('%Y/%m/%d')
+formatted_to_unix = lambda x: int(datetime.strptime(x, '%Y/%m/%d').timestamp())
 
 def dic_to_json(msg):
     new_msg = json.dumps(msg)
@@ -101,308 +109,307 @@ def json_to_dic(msg):
 
 def AddSTD():
 
-        #entering First name
-        dic_message = client.recv(1024).decode('utf-8')
-        message = json_to_dic(dic_message)
-        print("************************")
-        print(message["WHAT"])
-        
-        Fname = input("")
-        dic_msg = new_client.Protocole(assign_ip(), host, type(Fname), Fname)
-        msg = dic_to_json(dic_msg)
-        client.send(msg.encode('utf-8'))
-        
-        #entering Last name
-        dic_message = client.recv(1024).decode('utf-8')
-        message = json_to_dic(dic_message)
-        print("************************")
-        print(message["WHAT"])
-        
-        Lname = input("")
-        dic_msg = new_client.Protocole(assign_ip(), host, type(Lname), Lname)
-        msg = dic_to_json(dic_msg)
-        client.send(msg.encode('utf-8'))
+    #entering First name
+    dic_message = conn.client.recv(1024).decode('utf-8')
+    message = json_to_dic(dic_message)
+    print("************************")
+    print(message["WHAT"])
+    
+    Fname = input("")
+    dic_msg = new_client.Protocole(assign_ip(), conn.host, type(Fname), Fname)
+    msg = dic_to_json(dic_msg)
+    conn.client.send(msg.encode('utf-8'))
+    
+    #entering Last name
+    dic_message = conn.client.recv(1024).decode('utf-8')
+    message = json_to_dic(dic_message)
+    print("************************")
+    print(message["WHAT"])
+    
+    Lname = input("")
+    dic_msg = new_client.Protocole(assign_ip(), conn.host, type(Lname), Lname)
+    msg = dic_to_json(dic_msg)
+    conn.client.send(msg.encode('utf-8'))
 
-        #entering Age
-        dic_message = client.recv(1024).decode('utf-8')
-        message = json_to_dic(dic_message)
-        print("************************")
-        print(message["WHAT"])
-        
-        Age = input("")
-        dic_msg = new_client.Protocole(assign_ip(), host, type(Age), Age)
-        msg = dic_to_json(dic_msg)
-        client.send(msg.encode('utf-8'))
+    #entering Age
+    dic_message = conn.client.recv(1024).decode('utf-8')
+    message = json_to_dic(dic_message)
+    print("************************")
+    print(message["WHAT"])
+    
+    Age = input("")
+    dic_msg = new_client.Protocole(assign_ip(), conn.host, type(Age), Age)
+    msg = dic_to_json(dic_msg)
+    conn.client.send(msg.encode('utf-8'))
 
-        #entering MassarCode
-        dic_message = client.recv(1024).decode('utf-8')
-        message = json_to_dic(dic_message)
-        print("************************")
-        print(message["WHAT"])
-        
-        M_code = input("")
-        dic_msg = new_client.Protocole(assign_ip(), host, type(M_code), M_code)
-        msg = dic_to_json(dic_msg)
-        client.send(msg.encode('utf-8'))
-        
-        dic_message = client.recv(1024).decode('utf-8')
+    #entering MassarCode
+    dic_message = conn.client.recv(1024).decode('utf-8')
+    message = json_to_dic(dic_message)
+    print("************************")
+    print(message["WHAT"])
+    
+    M_code = input("")
+    dic_msg = new_client.Protocole(assign_ip(), conn.host, type(M_code), M_code)
+    msg = dic_to_json(dic_msg)
+    conn.client.send(msg.encode('utf-8'))
+    
+    dic_message = conn.client.recv(1024).decode('utf-8')
 
-        #Gender
-        message = json_to_dic(dic_message)
-        print("************************")
-        print(message["WHAT"])
-        
-        Gender = input("")
-        dic_msg = new_client.Protocole(assign_ip(), host, type(Gender), Gender)
-        msg = dic_to_json(dic_msg)
-        client.send(msg.encode('utf-8'))
+    #Gender
+    message = json_to_dic(dic_message)
+    print("************************")
+    print(message["WHAT"])
+    
+    Gender = input("")
+    dic_msg = new_client.Protocole(assign_ip(), conn.host, type(Gender), Gender)
+    msg = dic_to_json(dic_msg)
+    conn.client.send(msg.encode('utf-8'))
 
-        #Inputing Email
-        dic_message = client.recv(1024).decode('utf-8')
-        message = json_to_dic(dic_message)
-        print("************************")
-        print(message["WHAT"])
-        
-        Email = input("")
-        dic_msg = new_client.Protocole(assign_ip(), host, type(Email), Email)
-        msg = dic_to_json(dic_msg)
-        client.send(msg.encode('utf-8'))
+    #Inputing Email
+    dic_message = conn.client.recv(1024).decode('utf-8')
+    message = json_to_dic(dic_message)
+    print("************************")
+    print(message["WHAT"])
+    
+    Email = input("")
+    dic_msg = new_client.Protocole(assign_ip(), conn.host, type(Email), Email)
+    msg = dic_to_json(dic_msg)
+    conn.client.send(msg.encode('utf-8'))
 
-        #Inputing Country
-        dic_message = client.recv(1024).decode('utf-8')
-        message = json_to_dic(dic_message)
-        print("************************")
-        print(message["WHAT"])
-        
-        Country = input("")
-        dic_msg = new_client.Protocole(assign_ip(), host, type(Country), Country)
-        msg = dic_to_json(dic_msg)
-        client.send(msg.encode('utf-8'))
+    #Inputing Country
+    dic_message = conn.client.recv(1024).decode('utf-8')
+    message = json_to_dic(dic_message)
+    print("************************")
+    print(message["WHAT"])
+    
+    Country = input("")
+    dic_msg = new_client.Protocole(assign_ip(), conn.host, type(Country), Country)
+    msg = dic_to_json(dic_msg)
+    conn.client.send(msg.encode('utf-8'))
 
-        #Inputing City
-        dic_message = client.recv(1024).decode('utf-8')
-        message = json_to_dic(dic_message)
-        print("************************")
-        print(message["WHAT"])
-        
-        City = input("")
-        dic_msg = new_client.Protocole(assign_ip(), host, type(City), City)
-        msg = dic_to_json(dic_msg)
-        client.send(msg.encode('utf-8'))
+    #Inputing City
+    dic_message = conn.client.recv(1024).decode('utf-8')
+    message = json_to_dic(dic_message)
+    print("************************")
+    print(message["WHAT"])
+    
+    City = input("")
+    dic_msg = new_client.Protocole(assign_ip(), conn.host, type(City), City)
+    msg = dic_to_json(dic_msg)
+    conn.client.send(msg.encode('utf-8'))
 
-        #Inputing Address
-        dic_message = client.recv(1024).decode('utf-8')
-        message = json_to_dic(dic_message)
-        print("************************")
-        print(message["WHAT"])
-        
-        Address = input("")
-        dic_msg = new_client.Protocole(assign_ip(), host, type(Address), Address)
-        msg = dic_to_json(dic_msg)
-        client.send(msg.encode('utf-8'))
+    #Inputing Address
+    dic_message = conn.client.recv(1024).decode('utf-8')
+    message = json_to_dic(dic_message)
+    print("************************")
+    print(message["WHAT"])
+    
+    Address = input("")
+    dic_msg = new_client.Protocole(assign_ip(), conn.host, type(Address), Address)
+    msg = dic_to_json(dic_msg)
+    conn.client.send(msg.encode('utf-8'))
 
-        #Inputing Phone
-        dic_message = client.recv(1024).decode('utf-8')
-        message = json_to_dic(dic_message)
-        print("************************")
-        print(message["WHAT"])
-        
-        Phone = input("")
-        dic_msg = new_client.Protocole(assign_ip(), host, type(Phone), Phone)
-        msg = dic_to_json(dic_msg)
-        client.send(msg.encode('utf-8'))
+    #Inputing Phone
+    dic_message = conn.client.recv(1024).decode('utf-8')
+    message = json_to_dic(dic_message)
+    print("************************")
+    print(message["WHAT"])
+    
+    Phone = input("")
+    dic_msg = new_client.Protocole(assign_ip(), conn.host, type(Phone), Phone)
+    msg = dic_to_json(dic_msg)
+    conn.client.send(msg.encode('utf-8'))
 
-        #Inputing ClassID
-        dic_message = client.recv(1024).decode('utf-8')
-        message = json_to_dic(dic_message)
-        print("************************")
-        print(message["WHAT"])
-        
-        ClassID = input("")
-        dic_msg = new_client.Protocole(assign_ip(), host, type(ClassID), ClassID)
-        msg = dic_to_json(dic_msg)
-        client.send(msg.encode('utf-8'))
+    #Inputing ClassID
+    dic_message = conn.client.recv(1024).decode('utf-8')
+    message = json_to_dic(dic_message)
+    print("************************")
+    print(message["WHAT"])
+    
+    ClassID = input("")
+    dic_msg = new_client.Protocole(assign_ip(), conn.host, type(ClassID), ClassID)
+    msg = dic_to_json(dic_msg)
+    conn.client.send(msg.encode('utf-8'))
 
-        #Succes message
-        dic_message = client.recv(1024).decode('utf-8')
-        msg = json_to_dic(dic_message)
-        print("****************************************")
-        print(msg["WHAT"])
-        print("****************************************")
+    #Succes message
+    dic_message = conn.client.recv(1024).decode('utf-8')
+    msg = json_to_dic(dic_message)
+    print("****************************************")
+    print(msg["WHAT"])
+    print("****************************************")
 
 def DelSTD():
 
     while True:
 
         #receive
-        json_msg = client.recv(1024).decode('utf-8')
+        json_msg = conn.client.recv(1024).decode('utf-8')
         msg = json_to_dic(json_msg)
         print(msg["WHAT"])
 
         M_code = input("")
-        dic_msg = new_client.Protocole(host, assign_ip(), type(M_code), M_code)
+        dic_msg = new_client.Protocole(conn.host, assign_ip(), type(M_code), M_code)
         msg = dic_to_json(dic_msg)
-        client.send(msg.encode('utf-8'))
+        conn.client.send(msg.encode('utf-8'))
 
-        s_text = client.recv(1024).decode('utf-8')
+        s_text = conn.client.recv(1024).decode('utf-8')
         text = json_to_dic(s_text)
         print(text["WHAT"].strip())
         return
 
 def ModSTD():
 
-    #receive msg to enter MassarCode
-    json_msg = client.recv(1024).decode('utf-8')
+    # Receive msg to enter MassarCode
+    json_msg = conn.client.recv(1024).decode('utf-8')
     msg = json_to_dic(json_msg)
     print(msg["WHAT"])
 
-    #enter MassarCode and send it to server
+    # Enter MassarCode and send it to server
     M_code = input("")
-    dic_msg = new_client.Protocole(host, assign_ip(), type(M_code), M_code)
+    dic_msg = new_client.Protocole(conn.host, assign_ip(), type(M_code), M_code)
     msg = dic_to_json(dic_msg)
-    client.send(msg.encode('utf-8'))
+    conn.client.send(msg.encode('utf-8'))
 
-    Nmsg = client.recv(1024).decode('utf-8')
+    Nmsg = conn.client.recv(1024).decode('utf-8')
     msg = json_to_dic(Nmsg)
-    
+
     if msg["WHAT"] == "[ERROR] No Massar Code Found !":
         print(msg["WHAT"])
         return
 
-    #receive msg to choose what to change
-    
+    # Receive msg to choose what to change
     print(msg["WHAT"])
 
     resp = input()
-    dic_msg = new_client.Protocole(host, assign_ip(), type(resp), resp)
+    dic_msg = new_client.Protocole(conn.host, assign_ip(), type(resp), resp)
     msg = dic_to_json(dic_msg)
-    client.send(msg.encode('utf-8'))
+    conn.client.send(msg.encode('utf-8'))
 
     if resp == "1":
-        #entering First name
-        dic_message = client.recv(1024).decode('utf-8')
+        # Entering First name
+        dic_message = conn.client.recv(1024).decode('utf-8')
         message = json_to_dic(dic_message)
         print("************************")
         print(message["WHAT"])
-        
+
         Fname = input("")
-        dic_msg = new_client.Protocole(assign_ip(), host, type(Fname), Fname)
+        dic_msg = new_client.Protocole(assign_ip(), conn.host, type(Fname), Fname)
         msg = dic_to_json(dic_msg)
-        client.send(msg.encode('utf-8'))
-        
-        #entering Last name
-        dic_message = client.recv(1024).decode('utf-8')
+        conn.client.send(msg.encode('utf-8'))
+
+        # Entering Last name
+        dic_message = conn.client.recv(1024).decode('utf-8')
         message = json_to_dic(dic_message)
         print("************************")
         print(message["WHAT"])
-        
+
         Lname = input("")
-        dic_msg = new_client.Protocole(assign_ip(), host, type(Lname), Lname)
+        dic_msg = new_client.Protocole(assign_ip(), conn.host, type(Lname), Lname)
         msg = dic_to_json(dic_msg)
-        client.send(msg.encode('utf-8'))
+        conn.client.send(msg.encode('utf-8'))
 
-        #entering Age
-        dic_message = client.recv(1024).decode('utf-8')
+        # Entering Age
+        dic_message = conn.client.recv(1024).decode('utf-8')
         message = json_to_dic(dic_message)
         print("************************")
         print(message["WHAT"])
-        
+
         Age = input("")
-        dic_msg = new_client.Protocole(assign_ip(), host, type(Age), Age)
+        dic_msg = new_client.Protocole(assign_ip(), conn.host, type(Age), Age)
         msg = dic_to_json(dic_msg)
-        client.send(msg.encode('utf-8'))
+        conn.client.send(msg.encode('utf-8'))
 
-        #entering MassarCode
-        dic_message = client.recv(1024).decode('utf-8')
+        # Entering MassarCode
+        dic_message = conn.client.recv(1024).decode('utf-8')
         message = json_to_dic(dic_message)
         print("************************")
         print(message["WHAT"])
-        
+
         M_code = input("")
-        dic_msg = new_client.Protocole(assign_ip(), host, type(M_code), M_code)
+        dic_msg = new_client.Protocole(assign_ip(), conn.host, type(M_code), M_code)
         msg = dic_to_json(dic_msg)
-        client.send(msg.encode('utf-8'))
-        
-        dic_message = client.recv(1024).decode('utf-8')
+        conn.client.send(msg.encode('utf-8'))
 
-        #Gender
+        dic_message = conn.client.recv(1024).decode('utf-8')
+
+        # Gender
         message = json_to_dic(dic_message)
         print("************************")
         print(message["WHAT"])
-        
+
         Gender = input("")
-        dic_msg = new_client.Protocole(assign_ip(), host, type(Gender), Gender)
+        dic_msg = new_client.Protocole(assign_ip(), conn.host, type(Gender), Gender)
         msg = dic_to_json(dic_msg)
-        client.send(msg.encode('utf-8'))
+        conn.client.send(msg.encode('utf-8'))
 
-        #Inputing Email
-        dic_message = client.recv(1024).decode('utf-8')
+        # Inputing Email
+        dic_message = conn.client.recv(1024).decode('utf-8')
         message = json_to_dic(dic_message)
         print("************************")
         print(message["WHAT"])
-        
+
         Email = input("")
-        dic_msg = new_client.Protocole(assign_ip(), host, type(Email), Email)
+        dic_msg = new_client.Protocole(assign_ip(), conn.host, type(Email), Email)
         msg = dic_to_json(dic_msg)
-        client.send(msg.encode('utf-8'))
+        conn.client.send(msg.encode('utf-8'))
 
-        #Inputing Country
-        dic_message = client.recv(1024).decode('utf-8')
+        # Inputing Country
+        dic_message = conn.client.recv(1024).decode('utf-8')
         message = json_to_dic(dic_message)
         print("************************")
         print(message["WHAT"])
-        
+
         Country = input("")
-        dic_msg = new_client.Protocole(assign_ip(), host, type(Country), Country)
+        dic_msg = new_client.Protocole(assign_ip(), conn.host, type(Country), Country)
         msg = dic_to_json(dic_msg)
-        client.send(msg.encode('utf-8'))
+        conn.client.send(msg.encode('utf-8'))
 
-        #Inputing City
-        dic_message = client.recv(1024).decode('utf-8')
+        # Inputing City
+        dic_message = conn.client.recv(1024).decode('utf-8')
         message = json_to_dic(dic_message)
         print("************************")
         print(message["WHAT"])
-        
+
         City = input("")
-        dic_msg = new_client.Protocole(assign_ip(), host, type(City), City)
+        dic_msg = new_client.Protocole(assign_ip(), conn.host, type(City), City)
         msg = dic_to_json(dic_msg)
-        client.send(msg.encode('utf-8'))
+        conn.client.send(msg.encode('utf-8'))
 
-        #Inputing Address
-        dic_message = client.recv(1024).decode('utf-8')
+        # Inputing Address
+        dic_message = conn.client.recv(1024).decode('utf-8')
         message = json_to_dic(dic_message)
         print("************************")
         print(message["WHAT"])
-        
+
         Address = input("")
-        dic_msg = new_client.Protocole(assign_ip(), host, type(Address), Address)
+        dic_msg = new_client.Protocole(assign_ip(), conn.host, type(Address), Address)
         msg = dic_to_json(dic_msg)
-        client.send(msg.encode('utf-8'))
+        conn.client.send(msg.encode('utf-8'))
 
-        #Inputing Phone
-        dic_message = client.recv(1024).decode('utf-8')
+        # Inputing Phone
+        dic_message = conn.client.recv(1024).decode('utf-8')
         message = json_to_dic(dic_message)
         print("************************")
         print(message["WHAT"])
-        
+
         Phone = input("")
-        dic_msg = new_client.Protocole(assign_ip(), host, type(Phone), Phone)
+        dic_msg = new_client.Protocole(assign_ip(), conn.host, type(Phone), Phone)
         msg = dic_to_json(dic_msg)
-        client.send(msg.encode('utf-8'))
+        conn.client.send(msg.encode('utf-8'))
 
-        #Inputing ClassID
-        dic_message = client.recv(1024).decode('utf-8')
+        # Inputing ClassID
+        dic_message = conn.client.recv(1024).decode('utf-8')
         message = json_to_dic(dic_message)
         print("************************")
         print(message["WHAT"])
-        
-        ClassID = input("")
-        dic_msg = new_client.Protocole(assign_ip(), host, type(ClassID), ClassID)
-        msg = dic_to_json(dic_msg)
-        client.send(msg.encode('utf-8'))
 
-        #Succes message
-        dic_message = client.recv(1024).decode('utf-8')
+        ClassID = input("")
+        dic_msg = new_client.Protocole(assign_ip(), conn.host, type(ClassID), ClassID)
+        msg = dic_to_json(dic_msg)
+        conn.client.send(msg.encode('utf-8'))
+
+        # Success message
+        dic_message = conn.client.recv(1024).decode('utf-8')
         msg = json_to_dic(dic_message)
         print("****************************************")
         print(msg["WHAT"])
@@ -410,230 +417,226 @@ def ModSTD():
 
     elif resp == "2":
         while True:
-            Nmsg = client.recv(1024).decode('utf-8')
+            Nmsg = conn.client.recv(1024).decode('utf-8')
             msg = json_to_dic(Nmsg)
             print(msg["WHAT"])
 
-            #Choose Operation
+            # Choose Operation
             op = input()
 
-            if op == "1": #change Massar
-                Ndata = new_client.Protocole(host, assign_ip(), type(op), op)
+            if op == "1":  # change Massar
+                Ndata = new_client.Protocole(conn.host, assign_ip(), type(op), op)
                 data = dic_to_json(Ndata)
-                client.send(data.encode('utf-8'))
+                conn.client.send(data.encode('utf-8'))
 
-                Nmsg = client.recv(1024).decode('utf-8')
+                Nmsg = conn.client.recv(1024).decode('utf-8')
                 msg = json_to_dic(Nmsg)
                 print(msg["WHAT"])
-                
-                new = input()
-                Odata = new_client.Protocole(host, assign_ip(), type(new), new)
-                data = dic_to_json(Odata)
-                client.send(data.encode('utf-8'))
 
-                msg = client.recv(1024).decode('utf-8')
+                new = input()
+                Odata = new_client.Protocole(conn.host, assign_ip(), type(new), new)
+                data = dic_to_json(Odata)
+                conn.client.send(data.encode('utf-8'))
+
+                msg = conn.client.recv(1024).decode('utf-8')
                 Nmsg = json_to_dic(msg)
                 print(Nmsg["WHAT"])
-                
 
-            elif op == "2": #change first name
-                Ndata = new_client.Protocole(host, assign_ip(), type(op), op)
+            elif op == "2":  # change first name
+                Ndata = new_client.Protocole(conn.host, assign_ip(), type(op), op)
                 data = dic_to_json(Ndata)
-                client.send(data.encode('utf-8'))
+                conn.client.send(data.encode('utf-8'))
 
-                Nmsg = client.recv(1024).decode('utf-8')
+                Nmsg = conn.client.recv(1024).decode('utf-8')
                 msg = json_to_dic(Nmsg)
                 print(msg["WHAT"])
-                
-                new = input()
-                Odata = new_client.Protocole(host, assign_ip(), type(new), new)
-                data = dic_to_json(Odata)
-                client.send(data.encode('utf-8'))
 
-                msg = client.recv(1024).decode('utf-8')
+                new = input()
+                Odata = new_client.Protocole(conn.host, assign_ip(), type(new), new)
+                data = dic_to_json(Odata)
+                conn.client.send(data.encode('utf-8'))
+
+                msg = conn.client.recv(1024).decode('utf-8')
                 Nmsg = json_to_dic(msg)
                 print(Nmsg["WHAT"])
-                
-            
-            elif op == "3": #change last name
-                Ndata = new_client.Protocole(host, assign_ip(), type(op), op)
-                data = dic_to_json(Ndata)
-                client.send(data.encode('utf-8'))
 
-                Nmsg = client.recv(1024).decode('utf-8')
+            elif op == "3":  # change last name
+                Ndata = new_client.Protocole(conn.host, assign_ip(), type(op), op)
+                data = dic_to_json(Ndata)
+                conn.client.send(data.encode('utf-8'))
+
+                Nmsg = conn.client.recv(1024).decode('utf-8')
                 msg = json_to_dic(Nmsg)
                 print(msg["WHAT"])
-                
-                new = input()
-                Odata = new_client.Protocole(host, assign_ip(), type(new), new)
-                data = dic_to_json(Odata)
-                client.send(data.encode('utf-8'))
 
-                msg = client.recv(1024).decode('utf-8')
+                new = input()
+                Odata = new_client.Protocole(conn.host, assign_ip(), type(new), new)
+                data = dic_to_json(Odata)
+                conn.client.send(data.encode('utf-8'))
+
+                msg = conn.client.recv(1024).decode('utf-8')
                 Nmsg = json_to_dic(msg)
                 print(Nmsg["WHAT"])
-                
-            
-            elif op == "4": #change birthdate
-                Ndata = new_client.Protocole(host, assign_ip(), type(op), op)
-                data = dic_to_json(Ndata)
-                client.send(data.encode('utf-8'))
 
-                Nmsg = client.recv(1024).decode('utf-8')
+            elif op == "4":  # change birthdate
+                Ndata = new_client.Protocole(conn.host, assign_ip(), type(op), op)
+                data = dic_to_json(Ndata)
+                conn.client.send(data.encode('utf-8'))
+
+                Nmsg = conn.client.recv(1024).decode('utf-8')
                 msg = json_to_dic(Nmsg)
                 print(msg["WHAT"])
-                
-                new = input()
-                Odata = new_client.Protocole(host, assign_ip(), type(new), new)
-                data = dic_to_json(Odata)
-                client.send(data.encode('utf-8'))
 
-                msg = client.recv(1024).decode('utf-8')
+                new = input()
+                Odata = new_client.Protocole(conn.host, assign_ip(), type(new), new)
+                data = dic_to_json(Odata)
+                conn.client.send(data.encode('utf-8'))
+
+                msg = conn.client.recv(1024).decode('utf-8')
                 Nmsg = json_to_dic(msg)
                 print(Nmsg["WHAT"])
-                
-            
-            elif op == "5": #change Gender
-                Ndata = new_client.Protocole(host, assign_ip(), type(op), op)
-                data = dic_to_json(Ndata)
-                client.send(data.encode('utf-8'))
 
-                Nmsg = client.recv(1024).decode('utf-8')
+            elif op == "5":  # change Gender
+                Ndata = new_client.Protocole(conn.host, assign_ip(), type(op), op)
+                data = dic_to_json(Ndata)
+                conn.client.send(data.encode('utf-8'))
+
+                Nmsg = conn.client.recv(1024).decode('utf-8')
                 msg = json_to_dic(Nmsg)
                 print(msg["WHAT"])
-                
-                new = input()
-                Odata = new_client.Protocole(host, assign_ip(), type(new), new)
-                data = dic_to_json(Odata)
-                client.send(data.encode('utf-8'))
 
-                msg = client.recv(1024).decode('utf-8')
+                new = input()
+                Odata = new_client.Protocole(conn.host, assign_ip(), type(new), new)
+                data = dic_to_json(Odata)
+                conn.client.send(data.encode('utf-8'))
+
+                msg = conn.client.recv(1024).decode('utf-8')
                 Nmsg = json_to_dic(msg)
                 print(Nmsg["WHAT"])
                 
             
             elif op == "6": #change Email
-                Ndata = new_client.Protocole(host, assign_ip(), type(op), op)
+                Ndata = new_client.Protocole(conn.host, assign_ip(), type(op), op)
                 data = dic_to_json(Ndata)
-                client.send(data.encode('utf-8'))
+                conn.client.send(data.encode('utf-8'))
 
-                Nmsg = client.recv(1024).decode('utf-8')
+                Nmsg = conn.client.recv(1024).decode('utf-8')
                 msg = json_to_dic(Nmsg)
                 print(msg["WHAT"])
                 
                 new = input()
-                Odata = new_client.Protocole(host, assign_ip(), type(new), new)
+                Odata = new_client.Protocole(conn.host, assign_ip(), type(new), new)
                 data = dic_to_json(Odata)
-                client.send(data.encode('utf-8'))
+                conn.client.send(data.encode('utf-8'))
 
-                msg = client.recv(1024).decode('utf-8')
+                msg = conn.client.recv(1024).decode('utf-8')
                 Nmsg = json_to_dic(msg)
                 print(Nmsg["WHAT"])
                 
-            
+
             elif op == "7": #change Country
-                Ndata = new_client.Protocole(host, assign_ip(), type(op), op)
+                Ndata = new_client.Protocole(conn.host, assign_ip(), type(op), op)
                 data = dic_to_json(Ndata)
-                client.send(data.encode('utf-8'))
+                conn.client.send(data.encode('utf-8'))
 
-                Nmsg = client.recv(1024).decode('utf-8')
+                Nmsg = conn.client.recv(1024).decode('utf-8')
                 msg = json_to_dic(Nmsg)
                 print(msg["WHAT"])
                 
                 new = input()
-                Odata = new_client.Protocole(host, assign_ip(), type(new), new)
+                Odata = new_client.Protocole(conn.host, assign_ip(), type(new), new)
                 data = dic_to_json(Odata)
-                client.send(data.encode('utf-8'))
+                conn.client.send(data.encode('utf-8'))
 
-                msg = client.recv(1024).decode('utf-8')
+                msg = conn.client.recv(1024).decode('utf-8')
                 Nmsg = json_to_dic(msg)
                 print(Nmsg["WHAT"])
                 
-            
+
             elif op == "8": #change City
-                Ndata = new_client.Protocole(host, assign_ip(), type(op), op)
+                Ndata = new_client.Protocole(conn.host, assign_ip(), type(op), op)
                 data = dic_to_json(Ndata)
-                client.send(data.encode('utf-8'))
+                conn.client.send(data.encode('utf-8'))
 
-                Nmsg = client.recv(1024).decode('utf-8')
+                Nmsg = conn.client.recv(1024).decode('utf-8')
                 msg = json_to_dic(Nmsg)
                 print(msg["WHAT"])
                 
                 new = input()
-                Odata = new_client.Protocole(host, assign_ip(), type(new), new)
+                Odata = new_client.Protocole(conn.host, assign_ip(), type(new), new)
                 data = dic_to_json(Odata)
-                client.send(data.encode('utf-8'))
+                conn.client.send(data.encode('utf-8'))
 
-                msg = client.recv(1024).decode('utf-8')
+                msg = conn.client.recv(1024).decode('utf-8')
                 Nmsg = json_to_dic(msg)
                 print(Nmsg["WHAT"])
                 
-            
+
             elif op == "9": #change Address
-                Ndata = new_client.Protocole(host, assign_ip(), type(op), op)
+                Ndata = new_client.Protocole(conn.host, assign_ip(), type(op), op)
                 data = dic_to_json(Ndata)
-                client.send(data.encode('utf-8'))
+                conn.client.send(data.encode('utf-8'))
 
-                Nmsg = client.recv(1024).decode('utf-8')
+                Nmsg = conn.client.recv(1024).decode('utf-8')
                 msg = json_to_dic(Nmsg)
                 print(msg["WHAT"])
                 
                 new = input()
-                Odata = new_client.Protocole(host, assign_ip(), type(new), new)
+                Odata = new_client.Protocole(conn.host, assign_ip(), type(new), new)
                 data = dic_to_json(Odata)
-                client.send(data.encode('utf-8'))
+                conn.client.send(data.encode('utf-8'))
 
-                msg = client.recv(1024).decode('utf-8')
+                msg = conn.client.recv(1024).decode('utf-8')
                 Nmsg = json_to_dic(msg)
                 print(Nmsg["WHAT"])
                 
-            
+
             elif op == "10": #change Phone
-                Ndata = new_client.Protocole(host, assign_ip(), type(op), op)
+                Ndata = new_client.Protocole(conn.host, assign_ip(), type(op), op)
                 data = dic_to_json(Ndata)
-                client.send(data.encode('utf-8'))
+                conn.client.send(data.encode('utf-8'))
 
-                Nmsg = client.recv(1024).decode('utf-8')
+                Nmsg = conn.client.recv(1024).decode('utf-8')
                 msg = json_to_dic(Nmsg)
                 print(msg["WHAT"])
                 
                 new = input()
-                Odata = new_client.Protocole(host, assign_ip(), type(new), new)
+                Odata = new_client.Protocole(conn.host, assign_ip(), type(new), new)
                 data = dic_to_json(Odata)
-                client.send(data.encode('utf-8'))
+                conn.client.send(data.encode('utf-8'))
 
-                msg = client.recv(1024).decode('utf-8')
+                msg = conn.client.recv(1024).decode('utf-8')
                 Nmsg = json_to_dic(msg)
                 print(Nmsg["WHAT"])
                 
-            
-            elif op == "11": #change Class ID
-                Ndata = new_client.Protocole(host, assign_ip(), type(op), op)
-                data = dic_to_json(Ndata)
-                client.send(data.encode('utf-8'))
 
-                Nmsg = client.recv(1024).decode('utf-8')
+            elif op == "11": #change Class ID
+                Ndata = new_client.Protocole(conn.host, assign_ip(), type(op), op)
+                data = dic_to_json(Ndata)
+                conn.client.send(data.encode('utf-8'))
+
+                Nmsg = conn.client.recv(1024).decode('utf-8')
                 msg = json_to_dic(Nmsg)
                 print(msg["WHAT"])
                 
                 new = input()
-                Odata = new_client.Protocole(host, assign_ip(), type(new), new)
+                Odata = new_client.Protocole(conn.host, assign_ip(), type(new), new)
                 data = dic_to_json(Odata)
-                client.send(data.encode('utf-8'))
+                conn.client.send(data.encode('utf-8'))
 
-                msg = client.recv(1024).decode('utf-8')
+                msg = conn.client.recv(1024).decode('utf-8')
                 Nmsg = json_to_dic(msg)
                 print(Nmsg["WHAT"])
                 
             
             elif op == "12": #exit
-                Ndata = new_client.Protocole(host, assign_ip(), type(op), op)
+                Ndata = new_client.Protocole(conn.host, assign_ip(), type(op), op)
                 data = dic_to_json(Ndata)
-                client.send(data.encode('utf-8'))
+                conn.client.send(data.encode('utf-8'))
                 return False
 
 def ListSTD():
-    dic_message = client.recv(1024).decode()
+    dic_message = conn.client.recv(1024).decode()
     msg = json_to_dic(dic_message)
 
     new_msg = msg["WHAT"]
@@ -661,16 +664,16 @@ def ListSTD():
 def SearchSTD():
 
     #receive text to enter masarcode
-    json_msg = client.recv(1024).decode('utf-8')
+    json_msg = conn.client.recv(1024).decode('utf-8')
     msg = json_to_dic(json_msg)
     print(msg["WHAT"])
 
     M_code = input("")
-    dic_msg = new_client.Protocole(assign_ip(), host, type(M_code), M_code)
+    dic_msg = new_client.Protocole(assign_ip(), conn.host, type(M_code), M_code)
     msg = dic_to_json(dic_msg)
-    client.send(msg.encode('utf-8'))
+    conn.client.send(msg.encode('utf-8'))
 
-    json_M_code = client.recv(1024).decode('utf-8')
+    json_M_code = conn.client.recv(1024).decode('utf-8')
     M_code = json_to_dic(json_M_code)
 
     if M_code["WHAT"] == "[ERROR!]: MassarCode Not Found !":
@@ -688,7 +691,7 @@ def SearchSTD():
 def recv_menu():
     
     #Receive menu
-    err_msg = client.recv(1024).decode('utf-8')
+    err_msg = conn.client.recv(1024).decode('utf-8')
     msg = json_to_dic(err_msg)
     print(f'{msg["WHAT"]}')
 
@@ -705,11 +708,11 @@ def check_ID():
         with open("user.json", "r") as file:
             data = json.load(file)
             id = data["ID"]
-            msg = new_client.Protocole(assign_ip(), host, "", "", id)
+            msg = new_client.Protocole(assign_ip(), conn.host, "", "", id)
             text = dic_to_json(msg)
-            client.send(text.encode('utf-8'))
+            conn.client.send(text.encode('utf-8'))
             
-            text = client.recv(1024).decode('utf-8')
+            text = conn.client.recv(1024).decode('utf-8')
             msg = json_to_dic(text)
 
             if msg["WHAT"] == "[ID VERIFIED!]":
@@ -724,11 +727,11 @@ def check_ID():
     if not status:
         id = ""
 
-        msg = new_client.Protocole(assign_ip(), host, "", "", id)
+        msg = new_client.Protocole(assign_ip(), conn.host, "", "", id)
         text = dic_to_json(msg)
-        client.send(text.encode('utf-8'))
+        conn.client.send(text.encode('utf-8'))
         
-        text = client.recv(1024).decode('utf-8')
+        text = conn.client.recv(1024).decode('utf-8')
         msg = json_to_dic(text)
         if msg["WHAT"] == "[ID VERIFIED!]":
             return True
@@ -736,6 +739,8 @@ def check_ID():
             return False
 
 def client_side():
+
+    conn.start_client()
 
     auth = protocole(assign_ip())
 
@@ -750,49 +755,49 @@ def client_side():
 
             #AddSTD
             if order == '1':
-                dic_msg = new_client.Protocole(host, assign_ip(), type(order), order)
+                dic_msg = new_client.Protocole(conn.host, assign_ip(), type(order), order)
                 msg = dic_to_json(dic_msg)
-                client.send(msg.encode('utf-8'))
+                conn.client.send(msg.encode('utf-8'))
                 AddSTD()
 
             #DelSTD
             elif order == '2':
-                dic_msg = new_client.Protocole(host, assign_ip(), type(order), order)
+                dic_msg = new_client.Protocole(conn.host, assign_ip(), type(order), order)
                 msg = dic_to_json(dic_msg)
-                client.send(msg.encode('utf-8'))
+                conn.client.send(msg.encode('utf-8'))
                 DelSTD()
 
             #ModSTD
             elif order == '3':
-                dic_msg = new_client.Protocole(host, assign_ip(), type(order), order)
+                dic_msg = new_client.Protocole(conn.host, assign_ip(), type(order), order)
                 msg = dic_to_json(dic_msg)
-                client.send(msg.encode('utf-8'))
+                conn.client.send(msg.encode('utf-8'))
                 ModSTD()
 
             #ListSTD
             elif order == '4':
-                dic_msg = new_client.Protocole(host, assign_ip(), type(order), order)
+                dic_msg = new_client.Protocole(conn.host, assign_ip(), type(order), order)
                 msg = dic_to_json(dic_msg)
-                client.send(msg.encode('utf-8'))
+                conn.client.send(msg.encode('utf-8'))
                 ListSTD()
 
             #SearchSTD
             elif order == '5':
-                dic_msg = new_client.Protocole(host, assign_ip(), type(order), order)
+                dic_msg = new_client.Protocole(conn.host, assign_ip(), type(order), order)
                 msg = dic_to_json(dic_msg)
-                client.send(msg.encode('utf-8'))
+                conn.client.send(msg.encode('utf-8'))
                 SearchSTD()
 
             #exit
             elif order == '6':
-                dic_msg = new_client.Protocole(host, assign_ip(), type(order), order)
+                dic_msg = new_client.Protocole(conn.host, assign_ip(), type(order), order)
                 msg = dic_to_json(dic_msg)
-                client.send(msg.encode('utf-8'))
+                conn.client.send(msg.encode('utf-8'))
                 print("Have a good time :)")
                 exit()
             else:
-                client.send(order.encode('utf-8'))
-                msg = client.recv(1024).decode('utf-8')
+                conn.client.send(order.encode('utf-8'))
+                msg = conn.client.recv(1024).decode('utf-8')
                 print(msg) 
     else:
         while True:
@@ -803,49 +808,49 @@ def client_side():
             order = input()
             #AddSTD
             if order == '1':
-                dic_msg = new_client.Protocole(host, assign_ip(), type(order), order)
+                dic_msg = new_client.Protocole(conn.host, assign_ip(), type(order), order)
                 msg = dic_to_json(dic_msg)
-                client.send(msg.encode('utf-8'))
+                conn.client.send(msg.encode('utf-8'))
                 AddSTD()
 
             #DelSTD
             elif order == '2':
-                dic_msg = new_client.Protocole(host, assign_ip(), type(order), order)
+                dic_msg = new_client.Protocole(conn.host, assign_ip(), type(order), order)
                 msg = dic_to_json(dic_msg)
-                client.send(msg.encode('utf-8'))
+                conn.client.send(msg.encode('utf-8'))
                 DelSTD()
 
             #ModSTD
             elif order == '3':
-                dic_msg = new_client.Protocole(host, assign_ip(), type(order), order)
+                dic_msg = new_client.Protocole(conn.host, assign_ip(), type(order), order)
                 msg = dic_to_json(dic_msg)
-                client.send(msg.encode('utf-8'))
+                conn.client.send(msg.encode('utf-8'))
                 ModSTD()
 
             #ListSTD
             elif order == '4':
-                dic_msg = new_client.Protocole(host, assign_ip(), type(order), order)
+                dic_msg = new_client.Protocole(conn.host, assign_ip(), type(order), order)
                 msg = dic_to_json(dic_msg)
-                client.send(msg.encode('utf-8'))
+                conn.client.send(msg.encode('utf-8'))
                 ListSTD()
 
             #SearchSTD
             elif order == '5':
-                dic_msg = new_client.Protocole(host, assign_ip(), type(order), order)
+                dic_msg = new_client.Protocole(conn.host, assign_ip(), type(order), order)
                 msg = dic_to_json(dic_msg)
-                client.send(msg.encode('utf-8'))
+                conn.client.send(msg.encode('utf-8'))
                 SearchSTD()
 
             #exit
             elif order == '6':
-                dic_msg = new_client.Protocole(host, assign_ip(), type(order), order)
+                dic_msg = new_client.Protocole(conn.host, assign_ip(), type(order), order)
                 msg = dic_to_json(dic_msg)
-                client.send(msg.encode('utf-8'))
+                conn.client.send(msg.encode('utf-8'))
                 print("Have a good time :)")
                 exit()
             else:
-                client.send(order.encode('utf-8'))
-                msg = client.recv(1024).decode('utf-8')
+                conn.client.send(order.encode('utf-8'))
+                msg = conn.client.recv(1024).decode('utf-8')
                 print(msg) 
 
 if __name__ == '__main__':
